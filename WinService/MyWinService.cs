@@ -11,7 +11,7 @@ namespace WindowsService
 {
     public class WindowsService : System.ServiceProcess.ServiceBase
     {
-        private System.ComponentModel.IContainer components;
+        
         private ProjectInstaller projectInstaller2;
         private System.Diagnostics.EventLog eLog;
 
