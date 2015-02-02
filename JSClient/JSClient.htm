@@ -1,0 +1,32 @@
+<script type="text/javascript" src="jquery-1.4.4.min.js"></script>
+    <script type="text/javascript">
+        window.onload = invokeService();
+        function invokeService() {
+            $(document).ready(function () {
+
+                               //   Additional way of calling WCF service using getJSON() JQuery method
+                $.getJSON("http://localhost:8089/GetData/",
+                    function (data) {
+			
+                         alert("hello " + data);
+			alert(data.a);
+				for (var i=0;i<data.length;i++)
+				{
+
+				alert(data[i].a);
+				}
+
+                    });
+            });
+            }
+
+
+    </script>
+
+<html>
+<body>
+<P>
+Обращение к WCF сервису из JavaScript
+</P>
+</body>
+</html>

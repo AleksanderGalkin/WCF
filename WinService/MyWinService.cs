@@ -27,7 +27,7 @@ namespace WindowsService
         private void InitializeComponent()
         {
             this.eLog = new System.Diagnostics.EventLog();
-            this.projectInstaller2 = new WindowsService.ProjectInstaller();
+            this.projectInstaller2 = new ProjectInstaller();
             ((System.ComponentModel.ISupportInitialize)(this.eLog)).BeginInit();
             // 
             // eLog
@@ -67,27 +67,6 @@ namespace WindowsService
            }
            catch{}
         }
-
-         [RunInstallerAttribute(true)]
-         public class ProjectInstaller : System.Configuration.Install.Installer
-         {
-             public ProjectInstaller()
-                 : base()
-             {
-                 InitializeComponent();
-             }
-
-             private void InitializeComponent()
-             {
-
-             }
-         }
-
-         private void projectInstaller1_AfterInstall(object sender, System.Configuration.Install.InstallEventArgs e)
-         {
-
-         }
-
          private void eLog_EntryWritten(object sender, EntryWrittenEventArgs e)
          {
 
