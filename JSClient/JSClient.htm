@@ -19,7 +19,7 @@
             }); */
             $(document).ready(function () {
 				var jvar=[];
-				for (var i=0;i<60;i++)
+				for (var i=0;i<41000;i++)
 				{
 					jvar[i]=Object();
 					jvar[i].id=i;
@@ -33,8 +33,8 @@
 				
 				alert(jvar.length+"  "+jvar[jvar.length-1].val.length);
 		        var params = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes,width=900,height=500"
-				dop = window.open("", "sd", params);
-				dop.document.write(JSON.stringify(jvar));
+				//dop = window.open("", "sd", params);
+				//dop.document.write(JSON.stringify(jvar));
 				//{id:1,name:"Aleksander",val:36.2};
  				$.ajax({
 							type: "POST",

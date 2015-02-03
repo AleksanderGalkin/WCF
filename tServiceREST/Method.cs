@@ -24,7 +24,7 @@ namespace MyService
             [WebInvoke(Method = "POST",   
             RequestFormat = WebMessageFormat.Json,   
             ResponseFormat = WebMessageFormat.Json,
-            //BodyStyle = WebMessageBodyStyle.Wrapped,
+          //  BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "GetData/")]
             s1[] GetData(s1[] data);
 
@@ -49,6 +49,7 @@ namespace MyService
         {
             public s1[] GetData(s1[] data)
             {
+                Console.WriteLine(data.Length);
                 //s1[] ret_data=new s1[data.Count];
                 //for (int i=0;i<data.Count;i++)
                 //{
@@ -57,7 +58,7 @@ namespace MyService
                 //    ret_data[i].val = data[i].val + 1.5;
                 //}
 
-                Console.WriteLine("sdsds");
+                Console.WriteLine("Возврат данных");
                 return data;
             }
         }
