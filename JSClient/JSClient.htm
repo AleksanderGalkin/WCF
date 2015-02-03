@@ -1,11 +1,10 @@
+<meta http-equiv="X-UA-Compatible" content="IE=8" />
 <script type="text/javascript" src="jquery-1.4.4.min.js"></script>
     <script type="text/javascript">
-        window.onload = invokeService();
-        function invokeService() {
-            $(document).ready(function () {
-
+/*             $(document).ready(function () {
+                  alert(1);
                                //   Additional way of calling WCF service using getJSON() JQuery method
-                $.getJSON("http://localhost:8089/GetData/",
+                $.getJSON("http://localhost:8089/GetData/2",
                     function (data) {
 			
                          alert("hello " + data);
@@ -17,10 +16,43 @@
 				}
 
                     });
-            });
-            }
+            }); */
+            $(document).ready(function () {
+				var jvar=[];
+				for (var i=0;i<60;i++)
+				{
+					jvar[i]=Object();
+					jvar[i].id=i;
+					jvar[i].name="name"+i;
+					jvar[i].val=[];
+					for(var j=0;j<32;j++)
+					{
+						jvar[i].val[j]=i*j;
+					}
+				}
+				
+				alert(jvar.length+"  "+jvar[jvar.length-1].val.length);
+		        var params = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes,width=900,height=500"
+				dop = window.open("", "sd", params);
+				dop.document.write(JSON.stringify(jvar));
+				//{id:1,name:"Aleksander",val:36.2};
+ 				$.ajax({
+							type: "POST",
+							url: "http://localhost:8089/GetData/",
+							data: JSON.stringify(jvar),
+							contentType: "application/json; charset=utf-8",
+							dataType: "json",
+							success: function (msg) {
+									alert(msg[2].name)
+								
+							},
+							error: function () {
+								alert('failure');
+							}
+						}); 
+						
 
-
+			});
     </script>
 
 <html>

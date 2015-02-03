@@ -4,40 +4,61 @@ using System.Linq;
 using System.Text;
 using System.ServiceModel;
 using System.ServiceModel.Web;
+using System.Runtime.Serialization;
 
 namespace MyService    
 {
-    public struct s1 { public int a; public int b; };    
+    [DataContract]
+    public class s1 
+    {
+        [DataMember]public int id {get;set;}
+        [DataMember]public string name{get;set;}
+        [DataMember]public double[] val{get;set;}
+    };
+
     
         [ServiceContract]
         public interface IMyService
         {
             [OperationContract]
-            [WebInvoke(Method = "GET",   
+            [WebInvoke(Method = "POST",   
             RequestFormat = WebMessageFormat.Json,   
             ResponseFormat = WebMessageFormat.Json,
-           // BodyStyle = WebMessageBodyStyle.Wrapped,
-            UriTemplate = "GetData/{id}")]
-            s1[] GetData(string id);
+            //BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "GetData/")]
+            s1[] GetData(s1[] data);
+
+            //[OperationContract]
+            //[WebInvoke(Method = "GET",
+            //RequestFormat = WebMessageFormat.Json,
+            //ResponseFormat = WebMessageFormat.Json,
+            //    // BodyStyle = WebMessageBodyStyle.Wrapped,
+            //UriTemplate = "GetData/{id}")]
+            //s1 GetData(string id);
+
+            //[OperationContract]
+            //[WebInvoke(Method="POST",
+            //RequestFormat = WebMessageFormat.Json,
+            //ResponseFormat = WebMessageFormat.Json,
+            //    // BodyStyle = WebMessageBodyStyle.Wrapped,
+            //UriTemplate = "PostData/")]
+            //void GetData(s1[] data);
         }
 
         public class MyService : IMyService
         {
-            public s1[] GetData(string id)
+            public s1[] GetData(s1[] data)
             {
-
-                //switch (name)
+                //s1[] ret_data=new s1[data.Count];
+                //for (int i=0;i<data.Count;i++)
                 //{
-                //    case "Galkin":
-                //        return "Aleksandr";
-                //    case "Galkina":
-                //        return "Viktoria";
-                //    default:
-                //        return name + " is undefined";
+                //    ret_data[i].id = data[i].id;
+                //    ret_data[i].name = data[i].name;
+                //    ret_data[i].val = data[i].val + 1.5;
                 //}
 
-                s1[] names = new[] { new s1 { a = 1, b = 2 }, new s1 { a = 4, b = Convert.ToInt32(id) } };
-                return  names;
+                Console.WriteLine("sdsds");
+                return data;
             }
         }
 }

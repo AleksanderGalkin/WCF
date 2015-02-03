@@ -38,10 +38,44 @@ namespace WindowsService
 
         }
 
-        public static void Main()
+        public static void Main(string[] args)
         {
+            
+                        //WFCService service = new WFCService();
+                        //WFCService.Run
+                        //// Put a breakpoint on the following line to always catch
+                        //// your service when it has finished its work
+                        //System.Threading.Thread.Sleep(System.Threading.Timeout.Infinite);
+            
 
-            System.ServiceProcess.ServiceBase.Run(new WFCService());
+            WFCService service = new WFCService();
+
+            if (Environment.UserInteractive)
+            {
+                service.OnStart(args);
+                Console.WriteLine("Press any key to stop program");
+                Console.Read();
+                service.OnStop();
+            }
+            else
+            {
+                ServiceBase.Run(service);
+            }
+
+            //    System.ServiceProcess.ServiceBase.Run(new WFCService());
+
+            
+            //Console.WriteLine("asdasd");
+            //Type ServiceType = typeof(MyService.MyService);
+            //Uri ServiceURI = new Uri("http://localhost:8089/");
+            //ServiceHost host = new ServiceHost(ServiceType, ServiceURI);
+            //host.Open();
+            //Console.ForegroundColor = ConsoleColor.Blue;
+            //Console.WriteLine("Сервис информации о имени человека");
+            //Console.ForegroundColor = ConsoleColor.Gray;
+            //Console.WriteLine("Для закрытия сервиса нажмите Enter");
+            //Console.Read();
+
         }
 
 
