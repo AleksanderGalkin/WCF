@@ -13,6 +13,26 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WFCService", "WCFService\WF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tServiceREST", "tServiceREST\tServiceREST.csproj", "{2F5C70A3-00CB-4F00-BC6B-F110F6C5F371}"
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "JSClient", "JSClient\", "{73052A56-6008-45A3-8F50-03CC701C48BB}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/JSClient"
+		Debug.AspNetCompiler.PhysicalPath = "JSClient\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\JSClient\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/JSClient"
+		Release.AspNetCompiler.PhysicalPath = "JSClient\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\JSClient\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "64848"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +63,10 @@ Global
 		{2F5C70A3-00CB-4F00-BC6B-F110F6C5F371}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F5C70A3-00CB-4F00-BC6B-F110F6C5F371}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F5C70A3-00CB-4F00-BC6B-F110F6C5F371}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73052A56-6008-45A3-8F50-03CC701C48BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73052A56-6008-45A3-8F50-03CC701C48BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73052A56-6008-45A3-8F50-03CC701C48BB}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{73052A56-6008-45A3-8F50-03CC701C48BB}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

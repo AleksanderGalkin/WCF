@@ -8,14 +8,44 @@ using System.Runtime.Serialization;
 
 namespace MyService    
 {
-    [DataContract]
-    public class s1 
+    //[DataContract]
+    //public struct point 
+    //{
+    //    [DataMember]
+    //    public double x { get; set; }
+    //    [DataMember]
+    //    public double y { get; set; }
+    //    [DataMember]
+    //    public double z { get; set; }
+    //    [DataMember]
+    //    public double cr { get; set; }
+    //}
+
+    public class point
     {
-        [DataMember]public int id {get;set;}
-        [DataMember]public string name{get;set;}
-        [DataMember]public double[] val{get;set;}
+        public double x;
+        public double y;
+        public double z;
+        public double cr;
+    }
+    [DataContract]
+    public class dhObj
+    {
+        [DataMember] public point[] points { get; set; }
+        [DataMember] public double xElPos { get; set; }
+        [DataMember] public double yElPos { get; set; }
+        [DataMember] public double zElPos { get; set; }
+ 
     };
 
+    
+    [DataContract]
+    public class dhEllipse
+    {
+        [DataMember] public point Point { get; set; }
+        [DataMember] public double dipdirection { get; set; }
+        [DataMember] public double dip { get; set; }
+    };
     
         [ServiceContract]
         public interface IMyService
@@ -24,42 +54,23 @@ namespace MyService
             [WebInvoke(Method = "POST",   
             RequestFormat = WebMessageFormat.Json,   
             ResponseFormat = WebMessageFormat.Json,
-          //  BodyStyle = WebMessageBodyStyle.Wrapped,
+            //BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "GetData/")]
-            s1[] GetData(s1[] data);
 
-            //[OperationContract]
-            //[WebInvoke(Method = "GET",
-            //RequestFormat = WebMessageFormat.Json,
-            //ResponseFormat = WebMessageFormat.Json,
-            //    // BodyStyle = WebMessageBodyStyle.Wrapped,
-            //UriTemplate = "GetData/{id}")]
-            //s1 GetData(string id);
-
-            //[OperationContract]
-            //[WebInvoke(Method="POST",
-            //RequestFormat = WebMessageFormat.Json,
-            //ResponseFormat = WebMessageFormat.Json,
-            //    // BodyStyle = WebMessageBodyStyle.Wrapped,
-            //UriTemplate = "PostData/")]
-            //void GetData(s1[] data);
+            dhEllipse[] GetData(dhObj data);
         }
 
         public class MyService : IMyService
         {
-            public s1[] GetData(s1[] data)
+            public dhEllipse[] GetData(dhObj data)
             {
-                Console.WriteLine(data.Length);
-                //s1[] ret_data=new s1[data.Count];
-                //for (int i=0;i<data.Count;i++)
-                //{
-                //    ret_data[i].id = data[i].id;
-                //    ret_data[i].name = data[i].name;
-                //    ret_data[i].val = data[i].val + 1.5;
-                //}
-
-                Console.WriteLine("Возврат данных");
-                return data;
+                dhEllipse[] ellipses = new dhEllipse[data.points.Count()];
+                for (int i = 0; i < ellipses.Count(); i++)
+                    ellipses[i] = new dhEllipse();
+ 
+                Console.WriteLine("Обработка");
+                Console.WriteLine("Отправленно "+ellipses.Count().ToString()+" эллипсов");
+                return ellipses;
             }
         }
 }

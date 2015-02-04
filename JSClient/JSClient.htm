@@ -1,58 +1,50 @@
 <meta http-equiv="X-UA-Compatible" content="IE=8" />
 <script type="text/javascript" src="jquery-1.4.4.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="JSClient.js"></script>
     <script type="text/javascript">
-/*             $(document).ready(function () {
-                  alert(1);
-                               //   Additional way of calling WCF service using getJSON() JQuery method
-                $.getJSON("http://localhost:8089/GetData/2",
-                    function (data) {
-			
-                         alert("hello " + data);
-			alert(data.a);
-				for (var i=0;i<data.length;i++)
-				{
-
-				alert(data[i].a);
-				}
-
-                    });
-            }); */
             $(document).ready(function () {
-				var jvar=[];
-				for (var i=0;i<41000;i++)
-				{
-					jvar[i]=Object();
-					jvar[i].id=i;
-					jvar[i].name="name"+i;
-					jvar[i].val=[];
-					for(var j=0;j<32;j++)
-					{
-						jvar[i].val[j]=i*j;
-					}
-				}
-				
-				alert(jvar.length+"  "+jvar[jvar.length-1].val.length);
-		        var params = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes,width=900,height=500"
-				//dop = window.open("", "sd", params);
-				//dop.document.write(JSON.stringify(jvar));
-				//{id:1,name:"Aleksander",val:36.2};
- 				$.ajax({
-							type: "POST",
-							url: "http://localhost:8089/GetData/",
-							data: JSON.stringify(jvar),
-							contentType: "application/json; charset=utf-8",
-							dataType: "json",
-							success: function (msg) {
-									alert(msg[2].name)
+                
+                $('#getRotatedCS').click(function(){
+                    //var dhFile = new DHtable("E:\\GIT\\AleksanderGalkin\\WCF\\JSClient\\OC-430-165-DH.dm", 4, 4, 4);
+                    var dhFile = {"points":[{"x":123,"y":432,"z":6544,"cr":0.5}], "xElPos": 4, "yElPos": 4, "zElPos": 4 }
+                    var params = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes,width=900,height=500"
+                    dop = window.open("", "sd", params);
+                  dop.document.write(JSON.stringify(dhFile));
+ 				    $.ajax({
+							    type: "POST",
+							    url: "http://localhost:8089/GetData/",
+							    data: JSON.stringify(dhFile),
+							    contentType: "application/json; charset=utf-8",
+							    dataType: "json",
+							    success: function (msg) {
+									    alert(msg)
 								
-							},
-							error: function () {
-								alert('failure');
-							}
-						}); 
-						
+							    },
+							    error: function (err,err2) {
+								    alert('failure');
+							    }
+						    });
+                });
 
-			});
+            });
+//				var jvar=[];
+//				for (var i=0;i<40000;i++)
+//				{
+//					jvar[i]=Object();
+//					jvar[i].id=i;
+//					jvar[i].name="name"+i;
+//					jvar[i].val=[];
+//					for(var j=0;j<32;j++)
+//					{
+//						jvar[i].val[j]=i*j;
+//					}
+//				}
+
+
+            //var params = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes,width=900,height=500"
+            //dop = window.open("", "sd", params);
+            //dop.document.write(JSON.stringify(jvar));
+            //{id:1,name:"Aleksander",val:36.2};
     </script>
 
 <html>
@@ -60,5 +52,6 @@
 <P>
 Обращение к WCF сервису из JavaScript
 </P>
+<input type=button name="getRotatedCS" id="getRotatedCS" value="Получить повернутые координаты для точек"/>
 </body>
 </html>
