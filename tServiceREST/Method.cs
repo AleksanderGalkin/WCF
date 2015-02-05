@@ -5,22 +5,10 @@ using System.Text;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Runtime.Serialization;
+using tServiceREST;
 
 namespace MyService    
 {
-    //[DataContract]
-    //public struct point 
-    //{
-    //    [DataMember]
-    //    public double x { get; set; }
-    //    [DataMember]
-    //    public double y { get; set; }
-    //    [DataMember]
-    //    public double z { get; set; }
-    //    [DataMember]
-    //    public double cr { get; set; }
-    //}
-
     public class point
     {
         public double x;
@@ -32,9 +20,9 @@ namespace MyService
     public class dhObj
     {
         [DataMember] public point[] points { get; set; }
-        [DataMember] public double xElPos { get; set; }
-        [DataMember] public double yElPos { get; set; }
-        [DataMember] public double zElPos { get; set; }
+        [DataMember] public int xElPos { get; set; }
+        [DataMember] public int yElPos { get; set; }
+        [DataMember] public int zElPos { get; set; }
  
     };
 
@@ -67,7 +55,7 @@ namespace MyService
                 dhEllipse[] ellipses = new dhEllipse[data.points.Count()];
                 for (int i = 0; i < ellipses.Count(); i++)
                     ellipses[i] = new dhEllipse();
- 
+                theBestEllipseOfPoint elSeek = new theBestEllipseOfPoint(data.points, data.xElPos, data.yElPos, data.zElPos);
                 Console.WriteLine("Обработка");
                 Console.WriteLine("Отправленно "+ellipses.Count().ToString()+" эллипсов");
                 return ellipses;
