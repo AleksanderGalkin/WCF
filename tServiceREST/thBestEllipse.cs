@@ -8,14 +8,17 @@ namespace tServiceREST
 {
     class Ellipse
     {
+        public point pnt { get; set; }
         public double trDipDir{get;set;}
         public double trDip{get;set;}
+        public double criterion{get;set;}
     }
     
     class theBestEllipseOfPoint
     {
         private point[] pnts;
         private point[][][][] rtdPntsOfPoints;
+        private Ellipse[] theBestEllipses;
         private double angleX;
         private int numElipsX;
         private double angleY;
@@ -52,9 +55,10 @@ namespace tServiceREST
                 }
             }
 
-
-
-            
+            for (int i = 0; i < pnts.Count(); i++)
+            {
+                theBestEllipses[i] = getTheBestEllipseForPoint(i);
+            }
 
 
         }
@@ -79,7 +83,40 @@ namespace tServiceREST
             return p;
         }
 
+        private Ellipse getTheBestEllipseForPoint(int pIndex)
+        {
+            point[][][] rtdPntsSet=rtdPntsOfPoints[pIndex];
+            Ellipse e = new Ellipse();
+            double curCriterrion = 0;
+            double theBestCriterion = 0;
+            for (int ix = 0; ix < rtdPntsSet.Count(); ix++)
+            {
+                for (int iy = 0; iy < rtdPntsSet[ix].Count(); iy++)
+                {
+                    for (int iz = 0; iz < rtdPntsSet[ix][iy].Count(); iz++)
+                    {
+                        curCriterrion=getEllipseCriterion(rtdPntsSet[ix][iy][iz]);
+                        if (curCriterrion > theBestCriterion)
+                        {
+                            theBestCriterion = curCriterrion;
+                            e = getEllipseByRotation(ix, iy, iz);
+                        }
+                    }
+                }
+            }
+            return e;
+        }
 
+        double getEllipseCriterion(point pnt)
+        {
+
+            return 10;
+        }
+        Ellipse getEllipseByRotation(int ix, int iy, int iz) 
+        {
+            Ellipse e = new Ellipse();
+            return e;
+        }
     }
 
     
