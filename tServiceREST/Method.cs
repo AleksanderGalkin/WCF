@@ -56,6 +56,8 @@ namespace MyService
                 for (int i = 0; i < ellipses.Count(); i++)
                     ellipses[i] = new DhEllipse();
                 TheBestEllipseOfPoint elSeek = new TheBestEllipseOfPoint(data.points, data.xElPos, data.yElPos, data.zElPos);
+                elSeek.setTheBestEllipses();
+                
                 Console.WriteLine("Обработка");
                 Console.WriteLine("Отправленно "+ellipses.Count().ToString()+" эллипсов");
                 return ellipses;

@@ -10,9 +10,9 @@ namespace tServiceREST
     {
         public enum Method { Variance, Median }
         private Point       point_ { get; set; }
-        private double      trDipDir_ { get; set; }
-        private double      trDip_ { get; set; }
-        private double?     criterion_;
+        public double trDipDir { get; set; }
+        public double trDip { get; set; }
+        private double?     criterion_ { get; set; }
         private int         axisEllipseA_ { get; set; }
         private int         axisEllipseB_ { get; set; }
         private int         axisEllipseC_ { get; set; }
@@ -71,6 +71,8 @@ namespace tServiceREST
             }
 
         }
+
+
     }
     
     class TheBestEllipseOfPoint
@@ -128,10 +130,10 @@ namespace tServiceREST
                 }
             }
 
-            for (int i = 0; i < points_.Count(); i++)
-            {
-                theBestEllipses_[i] = computeTheBestEllipseForPoint(i);
-            }
+            //for (int i = 0; i < points_.Count(); i++)
+            //{
+            //    theBestEllipses_[i] = computeTheBestEllipseForPoint(i);
+            //}
 
 
         }
@@ -139,15 +141,18 @@ namespace tServiceREST
         {
 
             Point p=new Point();
+
             p.cr = pPnt.cr;
 
             p.x = pPnt.x;
             p.y = pPnt.y * Math.Cos(radX) + pPnt.z * Math.Sin(radX);
             p.z = -pPnt.y * Math.Sin(radX) + pPnt.z * Math.Cos(radX);
+            pPnt = p;
 
             p.y = pPnt.y;
             p.z = pPnt.z * Math.Cos(radY) + pPnt.x * Math.Sin(radY);
             p.x = -pPnt.z * Math.Sin(radY) + pPnt.x * Math.Cos(radY);
+            pPnt = p;
 
             p.z = pPnt.z;
             p.x = pPnt.x * Math.Cos(radZ) + pPnt.y * Math.Sin(radZ);
@@ -156,12 +161,48 @@ namespace tServiceREST
             return p;
         }
 
+
+        private Point getReverseRotatedPoint(Point pPnt, double radX, double radY, double radZ)
+        {
+            Point p = new Point();
+            p.cr = pPnt.cr;
+
+            p.x = pPnt.x;
+            p.y = pPnt.y * Math.Cos(radX) - pPnt.z * Math.Sin(radX);
+            p.z = pPnt.y * Math.Sin(radX) + pPnt.z * Math.Cos(radX);
+            pPnt = p;
+
+            p.y = pPnt.y;
+            p.z = pPnt.z * Math.Cos(radY) - pPnt.x * Math.Sin(radY);
+            p.x = pPnt.z * Math.Sin(radY) + pPnt.x * Math.Cos(radY);
+            pPnt = p;
+
+            p.z = pPnt.z;
+            p.x = pPnt.x * Math.Cos(radZ) - pPnt.y * Math.Sin(radZ);
+            p.y = pPnt.x * Math.Sin(radZ) + pPnt.y * Math.Cos(radZ);
+
+            return p;
+        }
+
+        public int setTheBestEllipses()
+        {
+            for (int i=0; i < points_.Count(); i++)
+            {
+                theBestEllipses_[i] = computeTheBestEllipseForPoint(i);
+            }
+
+            return 0;
+        }
+
         private Ellipse computeTheBestEllipseForPoint (int pIndex)
         {
             Point[][][] rtdPntsSet=rotatedPointsOfPoints_[pIndex];
-            Ellipse eRes = new Ellipse(new Point(), 1, 1, 1);
+            Ellipse eRes = new Ellipse(points_[pIndex], axisEllipseA, axisEllipseB, axisEllipseC);
             double? curCriterrion = 99999;
             double? theBestCriterion = 0;
+            int noRotationX = 0;
+            int noRotationY = 0;
+            int noRotationZ = 0;
             for (int ix = 0; ix < rtdPntsSet.Count(); ix++)
             {
                 for (int iy = 0; iy < rtdPntsSet[ix].Count(); iy++)
@@ -180,38 +221,69 @@ namespace tServiceREST
                         if (curCriterrion < theBestCriterion)
                         {
                             theBestCriterion = curCriterrion;
-                            e = getEllipseByRotation (ix, iy, iz);
+                            noRotationX = ix;
+                            noRotationY = iy;
+                            noRotationZ = iz;
                         }
                     }
                 }
             }
+            eRes.trDipDir = getTrueDipDirection(points_[pIndex],
+                                                rotatedPointsOfPoints_[pIndex][noRotationX][noRotationY][noRotationZ],
+                                                angleX_ * noRotationX,
+                                                angleY_ * noRotationY
+                                                );
+
+            eRes.trDip = getTrueDip(points_[pIndex],
+                                    rotatedPointsOfPoints_[pIndex][noRotationX][noRotationY][noRotationZ],
+                                    angleX_ * noRotationX,
+                                    angleZ_ * noRotationZ
+                                    );
             return eRes;
         }
 
-        private double getEllipseCriterion (Point pnt)
-        {
-            for (int i = 0; i < points_.Count(); i++)
-            {
-                for (int ix = 0; ix < rotatedPointsOfPoints_[i].Count(); ix++)
-                {
-                    for (int iy = 0; iy < rotatedPointsOfPoints_[i][ix].Count(); iy++)
-                    {
-                        for (int iz = 0; iz < rotatedPointsOfPoints_[i][ix][iy].Count(); iz++)
-                        {
-                            rotatedPointsOfPoints_[i][ix][iy][iz] = rotatedPointsOfPoints_[i][ix][iy][iz];
-                        }
-                    }
-                }
-            }
-                return 10;
-        }
-    
+        //private double getEllipseCriterion (Point pnt)
+        //{
+        //    for (int i = 0; i < points_.Count(); i++)
+        //    {
+        //        for (int ix = 0; ix < rotatedPointsOfPoints_[i].Count(); ix++)
+        //        {
+        //            for (int iy = 0; iy < rotatedPointsOfPoints_[i][ix].Count(); iy++)
+        //            {
+        //                for (int iz = 0; iz < rotatedPointsOfPoints_[i][ix][iy].Count(); iz++)
+        //                {
+        //                    rotatedPointsOfPoints_[i][ix][iy][iz] = rotatedPointsOfPoints_[i][ix][iy][iz];
+        //                }
+        //            }
+        //        }
+        //    }
+        //        return 10;
+        //}
 
-        private Ellipse getEllipseByRotation (int ix, int iy, int iz) 
+        double getTrueDipDirection(Point truePoint, Point fullRotatedPoint, double radX, double radY)
         {
-            Ellipse e = new Ellipse(new Point(),1,1,1);
-            return e;
+            Point oneRotatedPoint = getReverseRotatedPoint(fullRotatedPoint, radX, radY, 0);
+            double scalarProduct = truePoint.x * oneRotatedPoint.x + truePoint.y * oneRotatedPoint.y + truePoint.z * oneRotatedPoint.z;
+            double scalarVektor1 = Math.Sqrt(Math.Pow(      truePoint.x, 2)+Math.Pow(        truePoint.y, 2)+Math.Pow(        truePoint.z, 2));
+            double scalarVektor2 = Math.Sqrt(Math.Pow(oneRotatedPoint.x, 2) + Math.Pow(oneRotatedPoint.y, 2) + Math.Pow(oneRotatedPoint.z, 2));
+            double radAngle = Math.Acos(scalarProduct / (scalarVektor1 * scalarVektor2));
+            double degreeAngle = radAngle * 180 / Math.PI;
+
+            return degreeAngle+90;
         }
+
+        double getTrueDip(Point truePoint, Point fullRotatedPoint, double radX, double radZ)
+        {
+            Point oneRotatedPoint = getReverseRotatedPoint(fullRotatedPoint, radX, 0, radZ);
+            double scalarProduct = truePoint.x * oneRotatedPoint.x + truePoint.y * oneRotatedPoint.y + truePoint.z * oneRotatedPoint.z;
+            double scalarVektor1 = Math.Sqrt(Math.Pow(truePoint.x, 2) + Math.Pow(truePoint.y, 2) + Math.Pow(truePoint.z, 2));
+            double scalarVektor2 = Math.Sqrt(Math.Pow(oneRotatedPoint.x, 2) + Math.Pow(oneRotatedPoint.y, 2) + Math.Pow(oneRotatedPoint.z, 2));
+            double radAngle = Math.Acos(scalarProduct / (scalarVektor1 * scalarVektor2));
+            double degreeAngle = radAngle * 180 / Math.PI;
+
+            return degreeAngle;
+        }
+
     }
 
     
