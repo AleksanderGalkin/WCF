@@ -9,7 +9,7 @@ using tServiceREST;
 
 namespace MyService    
 {
-    public class point
+    public class Point
     {
         public double x;
         public double y;
@@ -17,9 +17,9 @@ namespace MyService
         public double cr;
     }
     [DataContract]
-    public class dhObj
+    public class DhObj
     {
-        [DataMember] public point[] points { get; set; }
+        [DataMember] public Point[] points { get; set; }
         [DataMember] public int xElPos { get; set; }
         [DataMember] public int yElPos { get; set; }
         [DataMember] public int zElPos { get; set; }
@@ -28,9 +28,9 @@ namespace MyService
 
     
     [DataContract]
-    public class dhEllipse
+    public class DhEllipse
     {
-        [DataMember] public point Point { get; set; }
+        [DataMember] public Point Point { get; set; }
         [DataMember] public double dipdirection { get; set; }
         [DataMember] public double dip { get; set; }
     };
@@ -45,17 +45,17 @@ namespace MyService
             //BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "GetData/")]
 
-            dhEllipse[] GetData(dhObj data);
+            DhEllipse[] getData(DhObj data);
         }
 
         public class MyService : IMyService
         {
-            public dhEllipse[] GetData(dhObj data)
+            public DhEllipse[] getData(DhObj data)
             {
-                dhEllipse[] ellipses = new dhEllipse[data.points.Count()];
+                DhEllipse[] ellipses = new DhEllipse[data.points.Count()];
                 for (int i = 0; i < ellipses.Count(); i++)
-                    ellipses[i] = new dhEllipse();
-                theBestEllipseOfPoint elSeek = new theBestEllipseOfPoint(data.points, data.xElPos, data.yElPos, data.zElPos);
+                    ellipses[i] = new DhEllipse();
+                TheBestEllipseOfPoint elSeek = new TheBestEllipseOfPoint(data.points, data.xElPos, data.yElPos, data.zElPos);
                 Console.WriteLine("Обработка");
                 Console.WriteLine("Отправленно "+ellipses.Count().ToString()+" эллипсов");
                 return ellipses;
