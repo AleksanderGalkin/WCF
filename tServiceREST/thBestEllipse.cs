@@ -6,75 +6,7 @@ using MyService;
 
 namespace tServiceREST
 {
-    //class Ellipse : DhEllipse
-    //{
-    //    public enum Method { Variance, Median }
-    //  //  public Point point { get; set; }      // Inherited
-    //    //  public double trDipDir { get; set; }   // Inherited
-    //    //  public double trDip { get; set; }          // Inherited
-    //    private double?     criterion_ { get; set; }
-    //    private int         axisEllipseA_ { get; set; }
-    //    private int         axisEllipseB_ { get; set; }
-    //    private int         axisEllipseC_ { get; set; }
 
-    //    public Ellipse(Point pPoint, int axisEllipseA, int axisEllipseB, int axisEllipseC)
-    //    {
-    //        point = pPoint;
-    //        axisEllipseA_ = axisEllipseA;
-    //        axisEllipseB_ = axisEllipseB;
-    //        axisEllipseC_ = axisEllipseC;
-    //        criterion_ = null;
-    //    }
-
-    //    public int setCriterion ( Point[] arrayOfPoints, Method method)
-    //    {
-    //        double sumSquareOfIndication = 0;
-    //        double sumOfIndication = 0;
-    //        int nIndication = 0;
-    //        for (int i = 0; i < arrayOfPoints.Count(); i++)
-    //        {
-    //            if (isPointOfEllipse(arrayOfPoints[i]))
-    //            {
-    //                sumSquareOfIndication +=  Math.Pow (arrayOfPoints[i].cr, 2);
-    //                sumOfIndication += arrayOfPoints[i].cr;
-    //                nIndication++;
-    //            }
-
-    //        }
-    //        criterion_ = (sumSquareOfIndication / nIndication) - Math.Pow(sumOfIndication / nIndication, 2); // For a while Variance only
-    //        return 0;
-    //    }
-
-    //    public double? getCriterion()
-    //    {
-    //        return criterion_;
-    //    }
-
-    //    bool isPointOfEllipse(Point parPoint)
-    //    {
-
-    //        double radicalExpression = 1 - (Math.Pow(parPoint.x - point.x, 2) / Math.Pow(axisEllipseA_, 2))
-    //                                        - (Math.Pow(parPoint.z - point.z, 2) / Math.Pow(axisEllipseC_, 2));
-    //        if (radicalExpression < 0)
-    //        {
-    //            return false;
-    //        }
-    //        double topFunctionOfXY = point.y + axisEllipseB_ * Math.Sqrt(radicalExpression);
-    //        double bottomFunctionOfXY = point.y - axisEllipseB_ * Math.Sqrt(radicalExpression);
-    //        if (parPoint.y >=  bottomFunctionOfXY && parPoint.y <= topFunctionOfXY)
-    //        {
-    //            return true;
-    //        }
-    //        else
-    //        {
-    //            return false;
-    //        }
-
-    //    }
-
-
-    //}
-    
     class TheBestEllipseOfPoint
     {
         private Point[]         points_;
@@ -135,58 +67,56 @@ namespace tServiceREST
                 }
             }
 
-            //for (int i = 0; i < points_.Count(); i++)
-            //{
-            //    theBestEllipses_[i] = computeTheBestEllipseForPoint(i);
-            //}
 
 
         }
         private Point getRotatedPoint(Point pPnt, double radX, double radY, double radZ)
         {
+            Point bufferPoint = new Point(pPnt);
+            Point resultPoint = new Point();
+            resultPoint.cr = bufferPoint.cr;
 
-            Point p=new Point();
+            resultPoint.x = bufferPoint.x;
+            resultPoint.y = bufferPoint.y * Math.Cos(radX) + bufferPoint.z * Math.Sin(radX);
+            resultPoint.z = -bufferPoint.y * Math.Sin(radX) + bufferPoint.z * Math.Cos(radX);
+            bufferPoint.x = resultPoint.x; bufferPoint.y = resultPoint.y; bufferPoint.z = resultPoint.z;
 
-            p.cr = pPnt.cr;
+            resultPoint.y = bufferPoint.y;
+            resultPoint.z = bufferPoint.z * Math.Cos(radY) + bufferPoint.x * Math.Sin(radY);
+            resultPoint.x = -bufferPoint.z * Math.Sin(radY) + bufferPoint.x * Math.Cos(radY);
+            bufferPoint.x = resultPoint.x; bufferPoint.y = resultPoint.y; bufferPoint.z = resultPoint.z;
 
-            p.x = pPnt.x;
-            p.y = pPnt.y * Math.Cos(radX) + pPnt.z * Math.Sin(radX);
-            p.z = -pPnt.y * Math.Sin(radX) + pPnt.z * Math.Cos(radX);
-            pPnt = p;
+            resultPoint.z = bufferPoint.z;
+            resultPoint.x = bufferPoint.x * Math.Cos(radZ) + bufferPoint.y * Math.Sin(radZ);
+            resultPoint.y = -bufferPoint.x * Math.Sin(radZ) + bufferPoint.y * Math.Cos(radZ);
 
-            p.y = pPnt.y;
-            p.z = pPnt.z * Math.Cos(radY) + pPnt.x * Math.Sin(radY);
-            p.x = -pPnt.z * Math.Sin(radY) + pPnt.x * Math.Cos(radY);
-            pPnt = p;
-
-            p.z = pPnt.z;
-            p.x = pPnt.x * Math.Cos(radZ) + pPnt.y * Math.Sin(radZ);
-            p.y = -pPnt.x * Math.Sin(radZ) + pPnt.y * Math.Cos(radZ);
-
-            return p;
+            return resultPoint;
         }
 
 
         private Point getReverseRotatedPoint(Point pPnt, double radX, double radY, double radZ)
         {
-            Point p = new Point();
-            p.cr = pPnt.cr;
+            Point bufferPoint = new Point(pPnt);
+            Point resultPoint = new Point();
+            resultPoint.cr = bufferPoint.cr;
 
-            p.x = pPnt.x;
-            p.y = pPnt.y * Math.Cos(radX) - pPnt.z * Math.Sin(radX);
-            p.z = pPnt.y * Math.Sin(radX) + pPnt.z * Math.Cos(radX);
-            pPnt = p;
 
-            p.y = pPnt.y;
-            p.z = pPnt.z * Math.Cos(radY) - pPnt.x * Math.Sin(radY);
-            p.x = pPnt.z * Math.Sin(radY) + pPnt.x * Math.Cos(radY);
-            pPnt = p;
+            resultPoint.z = bufferPoint.z;
+            resultPoint.x = bufferPoint.x * Math.Cos(radZ) - bufferPoint.y * Math.Sin(radZ);
+            resultPoint.y = bufferPoint.x * Math.Sin(radZ) + bufferPoint.y * Math.Cos(radZ);
+            bufferPoint.x = resultPoint.x; bufferPoint.y = resultPoint.y; bufferPoint.z = resultPoint.z;
 
-            p.z = pPnt.z;
-            p.x = pPnt.x * Math.Cos(radZ) - pPnt.y * Math.Sin(radZ);
-            p.y = pPnt.x * Math.Sin(radZ) + pPnt.y * Math.Cos(radZ);
+            resultPoint.y = bufferPoint.y;
+            resultPoint.z = bufferPoint.z * Math.Cos(radY) - bufferPoint.x * Math.Sin(radY);
+            resultPoint.x = bufferPoint.z * Math.Sin(radY) + bufferPoint.x * Math.Cos(radY);
+            bufferPoint.x = resultPoint.x; bufferPoint.y = resultPoint.y; bufferPoint.z = resultPoint.z;
 
-            return p;
+            resultPoint.x = bufferPoint.x;
+            resultPoint.y = bufferPoint.y * Math.Cos(radX) - bufferPoint.z * Math.Sin(radX);
+            resultPoint.z = bufferPoint.y * Math.Sin(radX) + bufferPoint.z * Math.Cos(radX);
+            
+
+            return resultPoint;
         }
 
         public int setTheBestEllipses()
@@ -194,8 +124,7 @@ namespace tServiceREST
             Console.WriteLine("Ищем лучший эллипс для точек:");
             for (int i=0; i < points_.Count(); i++)
             {
-               // theBestEllipses_[i] = new Ellipse();
-                theBestEllipses_[i] = computeTheBestEllipseForPoint(i);
+                   theBestEllipses_[i] = computeTheBestEllipseForPoint(i);
                 if (i%100==0)
                     Console.WriteLine("Точка: "+ i.ToString()+" Найдено.");
             }

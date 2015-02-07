@@ -15,6 +15,20 @@ namespace MyService
         public double y;
         public double z;
         public double cr;
+        public Point (Point point)
+        {
+            this.cr = point.cr;
+            this.x = point.x;
+            this.y = point.y;
+            this.z = point.z;
+        }
+        public Point()
+        {
+            cr = 0;
+            x = 0;
+            y = 0;
+            z = 0;
+        }
     }
     [DataContract]
     public class DhObj
