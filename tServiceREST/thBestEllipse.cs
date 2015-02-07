@@ -6,74 +6,74 @@ using MyService;
 
 namespace tServiceREST
 {
-    class Ellipse
-    {
-        public enum Method { Variance, Median }
-        private Point       point_ { get; set; }
-        public double trDipDir { get; set; }
-        public double trDip { get; set; }
-        private double?     criterion_ { get; set; }
-        private int         axisEllipseA_ { get; set; }
-        private int         axisEllipseB_ { get; set; }
-        private int         axisEllipseC_ { get; set; }
+    //class Ellipse : DhEllipse
+    //{
+    //    public enum Method { Variance, Median }
+    //  //  public Point point { get; set; }      // Inherited
+    //    //  public double trDipDir { get; set; }   // Inherited
+    //    //  public double trDip { get; set; }          // Inherited
+    //    private double?     criterion_ { get; set; }
+    //    private int         axisEllipseA_ { get; set; }
+    //    private int         axisEllipseB_ { get; set; }
+    //    private int         axisEllipseC_ { get; set; }
 
-        public Ellipse(Point point, int axisEllipseA, int axisEllipseB, int axisEllipseC)
-        {
-            point_ = point;
-            axisEllipseA_ = axisEllipseA;
-            axisEllipseB_ = axisEllipseB;
-            axisEllipseC_ = axisEllipseC;
-            criterion_ = null;
-        }
+    //    public Ellipse(Point pPoint, int axisEllipseA, int axisEllipseB, int axisEllipseC)
+    //    {
+    //        point = pPoint;
+    //        axisEllipseA_ = axisEllipseA;
+    //        axisEllipseB_ = axisEllipseB;
+    //        axisEllipseC_ = axisEllipseC;
+    //        criterion_ = null;
+    //    }
 
-        public int setCriterion ( Point[] arrayOfPoints, Method method)
-        {
-            double sumSquareOfIndication = 0;
-            double sumOfIndication = 0;
-            int nIndication = 0;
-            for (int i = 0; i < arrayOfPoints.Count(); i++)
-            {
-                if (isPointOfEllipse(arrayOfPoints[i]))
-                {
-                    sumSquareOfIndication = + Math.Pow (arrayOfPoints[i].cr, 2);
-                    sumOfIndication = + arrayOfPoints[i].cr;
-                    nIndication++;
-                }
+    //    public int setCriterion ( Point[] arrayOfPoints, Method method)
+    //    {
+    //        double sumSquareOfIndication = 0;
+    //        double sumOfIndication = 0;
+    //        int nIndication = 0;
+    //        for (int i = 0; i < arrayOfPoints.Count(); i++)
+    //        {
+    //            if (isPointOfEllipse(arrayOfPoints[i]))
+    //            {
+    //                sumSquareOfIndication +=  Math.Pow (arrayOfPoints[i].cr, 2);
+    //                sumOfIndication += arrayOfPoints[i].cr;
+    //                nIndication++;
+    //            }
 
-            }
-            criterion_=(sumSquareOfIndication / nIndication) - (Math.Pow(sumOfIndication, 2) / nIndication); // For a while Variance only
-            return 0;
-        }
+    //        }
+    //        criterion_ = (sumSquareOfIndication / nIndication) - Math.Pow(sumOfIndication / nIndication, 2); // For a while Variance only
+    //        return 0;
+    //    }
 
-        public double? getCriterion()
-        {
-            return criterion_;
-        }
+    //    public double? getCriterion()
+    //    {
+    //        return criterion_;
+    //    }
 
-        bool isPointOfEllipse(Point point)
-        {
+    //    bool isPointOfEllipse(Point parPoint)
+    //    {
 
-            double radicalExpression = 1 - (Math.Pow(point.x - point_.x, 2) / Math.Pow(axisEllipseA_, 2))
-                                            - (Math.Pow(point.z - point_.z, 2) / Math.Pow(axisEllipseC_, 2));
-            if (radicalExpression < 0)
-            {
-                return false;
-            }
-            double topFunctionOfXY = point_.y + axisEllipseB_ * Math.Sqrt(radicalExpression);
-            double bottomFunctionOfXY = point_.y - axisEllipseB_ * Math.Sqrt(radicalExpression);
-            if (point.y >=  bottomFunctionOfXY && point.y <= topFunctionOfXY)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+    //        double radicalExpression = 1 - (Math.Pow(parPoint.x - point.x, 2) / Math.Pow(axisEllipseA_, 2))
+    //                                        - (Math.Pow(parPoint.z - point.z, 2) / Math.Pow(axisEllipseC_, 2));
+    //        if (radicalExpression < 0)
+    //        {
+    //            return false;
+    //        }
+    //        double topFunctionOfXY = point.y + axisEllipseB_ * Math.Sqrt(radicalExpression);
+    //        double bottomFunctionOfXY = point.y - axisEllipseB_ * Math.Sqrt(radicalExpression);
+    //        if (parPoint.y >=  bottomFunctionOfXY && parPoint.y <= topFunctionOfXY)
+    //        {
+    //            return true;
+    //        }
+    //        else
+    //        {
+    //            return false;
+    //        }
 
-        }
+    //    }
 
 
-    }
+    //}
     
     class TheBestEllipseOfPoint
     {
@@ -99,14 +99,19 @@ namespace tServiceREST
             axisEllipseB = 10;
             axisEllipseC = 10;
 
+            theBestEllipses_ = new Ellipse[points.Count()];
+
             points_  = points;
             nElipsX_ = nElpsX;
             nElipsY_ = nElpsY;
             nElipsZ_ = nElpsZ;
-            angleX_  = 6.2831853072 / nElipsX_;
-            angleY_  = 6.2831853072 / nElipsY_;
-            angleZ_  = 6.2831853072 / nElipsZ_;
-            int numElipsCompination = nElipsX_ * nElipsY_ * nElipsZ_;
+            angleX_  = 6.2831853072 / (nElipsX_*2);
+            angleY_  = 6.2831853072 / (nElipsY_*2);
+            angleZ_  = 6.2831853072 / (nElipsZ_*2);
+            int numElipsCombination = nElipsX_ * nElipsY_ * nElipsZ_;
+
+            Console.WriteLine("Формирование массива повернутых точек");
+
             rotatedPointsOfPoints_ = new Point[points_.Count()][][][];  //массив поворотов точек
             for (int i = 0; i < rotatedPointsOfPoints_.Count();i++ )
             {
@@ -186,9 +191,13 @@ namespace tServiceREST
 
         public int setTheBestEllipses()
         {
+            Console.WriteLine("Ищем лучший эллипс для точек:");
             for (int i=0; i < points_.Count(); i++)
             {
+               // theBestEllipses_[i] = new Ellipse();
                 theBestEllipses_[i] = computeTheBestEllipseForPoint(i);
+                if (i%100==0)
+                    Console.WriteLine("Точка: "+ i.ToString()+" Найдено.");
             }
 
             return 0;
@@ -199,7 +208,7 @@ namespace tServiceREST
             Point[][][] rtdPntsSet=rotatedPointsOfPoints_[pIndex];
             Ellipse eRes = new Ellipse(points_[pIndex], axisEllipseA, axisEllipseB, axisEllipseC);
             double? curCriterrion = 99999;
-            double? theBestCriterion = 0;
+            double? theBestCriterion = 99999;
             int noRotationX = 0;
             int noRotationY = 0;
             int noRotationZ = 0;
@@ -209,7 +218,7 @@ namespace tServiceREST
                 {
                     for (int iz = 0; iz < rtdPntsSet[ix][iy].Count(); iz++)
                     {
-                        Ellipse e = new Ellipse(points_[pIndex], axisEllipseA, axisEllipseB, axisEllipseC);
+                        Ellipse e = new Ellipse(rtdPntsSet[ix][iy][iz], axisEllipseA, axisEllipseB, axisEllipseC);
                         Point[] oneRotationPoints=new Point[rotatedPointsOfPoints_.Count()];
                         for (int i = 0; i<rotatedPointsOfPoints_.Count(); i++)
                         {
@@ -234,31 +243,20 @@ namespace tServiceREST
                                                 angleY_ * noRotationY
                                                 );
 
+            
             eRes.trDip = getTrueDip(points_[pIndex],
                                     rotatedPointsOfPoints_[pIndex][noRotationX][noRotationY][noRotationZ],
                                     angleX_ * noRotationX,
                                     angleZ_ * noRotationZ
                                     );
+            if (double.IsNaN(eRes.trDipDir))  // решить потом эту проблемму
+                eRes.trDipDir = 360;
+            if (double.IsNaN(eRes.trDip))
+                eRes.trDip = 360;
+
             return eRes;
         }
 
-        //private double getEllipseCriterion (Point pnt)
-        //{
-        //    for (int i = 0; i < points_.Count(); i++)
-        //    {
-        //        for (int ix = 0; ix < rotatedPointsOfPoints_[i].Count(); ix++)
-        //        {
-        //            for (int iy = 0; iy < rotatedPointsOfPoints_[i][ix].Count(); iy++)
-        //            {
-        //                for (int iz = 0; iz < rotatedPointsOfPoints_[i][ix][iy].Count(); iz++)
-        //                {
-        //                    rotatedPointsOfPoints_[i][ix][iy][iz] = rotatedPointsOfPoints_[i][ix][iy][iz];
-        //                }
-        //            }
-        //        }
-        //    }
-        //        return 10;
-        //}
 
         double getTrueDipDirection(Point truePoint, Point fullRotatedPoint, double radX, double radY)
         {
@@ -282,6 +280,11 @@ namespace tServiceREST
             double degreeAngle = radAngle * 180 / Math.PI;
 
             return degreeAngle;
+        }
+
+        public Ellipse[] getTheBestEllipses()
+        {
+            return theBestEllipses_;
         }
 
     }
