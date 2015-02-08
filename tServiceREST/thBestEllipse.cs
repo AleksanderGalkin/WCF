@@ -75,6 +75,7 @@ namespace tServiceREST
             Point bufferPoint = new Point(pPnt);
             Point resultPoint = new Point();
             resultPoint.cr = bufferPoint.cr;
+            resultPoint.info = bufferPoint.info;
 
             resultPoint.x = bufferPoint.x;
             resultPoint.y = bufferPoint.y * Math.Cos(radX) + bufferPoint.z * Math.Sin(radX);
@@ -99,7 +100,7 @@ namespace tServiceREST
             Point bufferPoint = new Point(pPnt);
             Point resultPoint = new Point();
             resultPoint.cr = bufferPoint.cr;
-
+            resultPoint.info = bufferPoint.info;
 
             resultPoint.z = bufferPoint.z;
             resultPoint.x = bufferPoint.x * Math.Cos(radZ) - bufferPoint.y * Math.Sin(radZ);
@@ -119,7 +120,7 @@ namespace tServiceREST
             return resultPoint;
         }
 
-        public int setTheBestEllipses()
+        public int ComputeTheBestEllipses()
         {
             Console.WriteLine("Ищем лучший эллипс для точек:");
             for (int i=0; i < points_.Count(); i++)
@@ -153,9 +154,15 @@ namespace tServiceREST
                         {
                             oneRotationPoints[i]=rotatedPointsOfPoints_[i][ix][iy][iz];
                         }
-                        e.setCriterion(oneRotationPoints, Ellipse.Method.Variance);
-
+                        e.setCriterion(oneRotationPoints, Ellipse.Method.Variance, pIndex==4?true:false);
                         curCriterrion=e.getCriterion();
+
+                        if (pIndex == 4)
+                        {
+                            Console.WriteLine(" поворот " + ix.ToString() + " , " + iy.ToString() + " , " + iz.ToString());
+                            Console.WriteLine(" curCriterrion " + curCriterrion.ToString());
+                        }
+
                         if (curCriterrion < theBestCriterion)
                         {
                             theBestCriterion = curCriterrion;
@@ -166,50 +173,142 @@ namespace tServiceREST
                     }
                 }
             }
-            eRes.trDipDir = getTrueDipDirection(points_[pIndex],
-                                                rotatedPointsOfPoints_[pIndex][noRotationX][noRotationY][noRotationZ],
-                                                angleX_ * noRotationX,
-                                                angleY_ * noRotationY
+
+            if (pIndex == 4)
+            {
+                Console.WriteLine(" Лучший поворот " + noRotationX.ToString() + " , " + noRotationY.ToString() + " , " + noRotationZ.ToString());
+                Console.WriteLine(" Лучший curCriterrion " + theBestCriterion.ToString());
+            }
+
+            if (pIndex == 4)
+            { ;}
+
+
+            eRes.trDipDir = getTrueDipDirection(angleX_ * noRotationX,
+                                                angleY_ * noRotationY,
+                                                angleZ_ * noRotationZ
                                                 );
 
             
-            eRes.trDip = getTrueDip(points_[pIndex],
-                                    rotatedPointsOfPoints_[pIndex][noRotationX][noRotationY][noRotationZ],
+            eRes.trDip = getTrueDip(
                                     angleX_ * noRotationX,
+                                    angleY_ * noRotationY,
                                     angleZ_ * noRotationZ
                                     );
-            if (double.IsNaN(eRes.trDipDir))  // решить потом эту проблемму
-                eRes.trDipDir = 360;
-            if (double.IsNaN(eRes.trDip))
-                eRes.trDip = 360;
+
+
+            //if (double.IsNaN(eRes.trDipDir))  // решить потом эту проблемму
+            //    eRes.trDipDir = 360;
+            //if (double.IsNaN(eRes.trDip))
+            //    eRes.trDip = 360;
 
             return eRes;
         }
 
 
-        double getTrueDipDirection(Point truePoint, Point fullRotatedPoint, double radX, double radY)
+        double getTrueDipDirection(double radX, double radY,double radZ)
         {
-            Point oneRotatedPoint = getReverseRotatedPoint(fullRotatedPoint, radX, radY, 0);
-            double scalarProduct = truePoint.x * oneRotatedPoint.x + truePoint.y * oneRotatedPoint.y + truePoint.z * oneRotatedPoint.z;
-            double scalarVektor1 = Math.Sqrt(Math.Pow(      truePoint.x, 2)+Math.Pow(        truePoint.y, 2)+Math.Pow(        truePoint.z, 2));
-            double scalarVektor2 = Math.Sqrt(Math.Pow(oneRotatedPoint.x, 2) + Math.Pow(oneRotatedPoint.y, 2) + Math.Pow(oneRotatedPoint.z, 2));
-            double radAngle = Math.Acos(scalarProduct / (scalarVektor1 * scalarVektor2));
-            double degreeAngle = radAngle * 180 / Math.PI;
 
-            return degreeAngle+90;
+
+            Point reversedXVektor = getReverseRotatedPoint(getXVector(), radX, radY, radZ);
+            Point azimuth = getAzimuth();
+            Point XYProjectionOfReversedXVektor = getXYProjection(reversedXVektor, azimuth);
+
+            if (isNullVector(XYProjectionOfReversedXVektor))
+            {
+                XYProjectionOfReversedXVektor.z = 10;
+            }
+
+            double scalarProduct = azimuth.x * XYProjectionOfReversedXVektor.x + azimuth.y * XYProjectionOfReversedXVektor.y + azimuth.z * XYProjectionOfReversedXVektor.z;
+            double scalarVektor1 = Math.Sqrt(Math.Pow(azimuth.x, 2) + Math.Pow(azimuth.y, 2) + Math.Pow(azimuth.z, 2));
+            double scalarVektor2 = Math.Sqrt(Math.Pow(XYProjectionOfReversedXVektor.x, 2) + Math.Pow(XYProjectionOfReversedXVektor.y, 2) + Math.Pow(XYProjectionOfReversedXVektor.z, 2));
+            double radAngleAz = Math.Acos(scalarProduct / (scalarVektor1 * scalarVektor2));
+            double degreeAngleAz = radAngleAz * 180 / Math.PI;
+
+
+            return degreeAngleAz;
         }
 
-        double getTrueDip(Point truePoint, Point fullRotatedPoint, double radX, double radZ)
+        double getTrueDip( double radX, double radY, double radZ)
         {
-            Point oneRotatedPoint = getReverseRotatedPoint(fullRotatedPoint, radX, 0, radZ);
-            double scalarProduct = truePoint.x * oneRotatedPoint.x + truePoint.y * oneRotatedPoint.y + truePoint.z * oneRotatedPoint.z;
-            double scalarVektor1 = Math.Sqrt(Math.Pow(truePoint.x, 2) + Math.Pow(truePoint.y, 2) + Math.Pow(truePoint.z, 2));
-            double scalarVektor2 = Math.Sqrt(Math.Pow(oneRotatedPoint.x, 2) + Math.Pow(oneRotatedPoint.y, 2) + Math.Pow(oneRotatedPoint.z, 2));
-            double radAngle = Math.Acos(scalarProduct / (scalarVektor1 * scalarVektor2));
-            double degreeAngle = radAngle * 180 / Math.PI;
+            Point reversedXVektor = getReverseRotatedPoint(getXVector(), radX, radY, radZ);
+            Point azimuth = getAzimuth();
+            Point ZYProjectionOfReversedXVektor = getZYProjection(reversedXVektor, azimuth);
 
-            return degreeAngle;
+            if (isNullVector(ZYProjectionOfReversedXVektor))
+            {
+                ZYProjectionOfReversedXVektor.x = 10;
+            }
+
+            double scalarProduct = azimuth.x * ZYProjectionOfReversedXVektor.x + azimuth.y * ZYProjectionOfReversedXVektor.y + azimuth.z * ZYProjectionOfReversedXVektor.z;
+            double scalarVektor1 = Math.Sqrt(Math.Pow(azimuth.x, 2) + Math.Pow(azimuth.y, 2) + Math.Pow(azimuth.z, 2));
+            double scalarVektor2 = Math.Sqrt(Math.Pow(ZYProjectionOfReversedXVektor.x, 2) + Math.Pow(ZYProjectionOfReversedXVektor.y, 2) + Math.Pow(ZYProjectionOfReversedXVektor.z, 2));
+            double radAngleAz = Math.Acos(scalarProduct / (scalarVektor1 * scalarVektor2));
+            double degreeAngleAz = radAngleAz * 180 / Math.PI;
+
+            return degreeAngleAz;
         }
+
+        //Point getPointOfAxisXOrientedVektor (Point point)
+        //{
+        //    Point resPoint = new Point (point);
+        //    resPoint.x = resPoint.x + 10;
+        //    return resPoint;
+        //}
+
+        Point getXYProjection (Point point, Point planePoint)
+        {
+            Point resPoint = new Point(point);
+            resPoint.z = planePoint.z;
+            return resPoint;
+        }
+
+        Point getZYProjection(Point point, Point planePoint)
+        {
+            Point resPoint = new Point(point);
+            resPoint.x = planePoint.x;
+            return resPoint;
+        }
+
+        Point getAzimuth ()
+        {
+            Point resPoint = new Point();
+            resPoint.x = 0;
+            resPoint.z = 0;
+            resPoint.y = 10;
+            return resPoint;
+        }
+
+        Point getXVector()
+        {
+            Point resPoint = new Point();
+            resPoint.x = 10;
+            resPoint.z = 0;
+            resPoint.y = 0;
+            return resPoint;
+        }
+
+        bool isNullVector(Point point)
+        {
+            if (point.x == 0 && point.y == 0 && point.z == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        //Point getVektor(Point point1, Point point2)
+        //{
+        //    Point resPoint = new Point();
+        //    resPoint.x = point2.x - point1.x;
+        //    resPoint.y = point2.y - point1.y;
+        //    resPoint.z = point2.z - point1.z;
+        //    return resPoint;
+        //}
 
         public Ellipse[] getTheBestEllipses()
         {

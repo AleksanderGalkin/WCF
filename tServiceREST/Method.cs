@@ -15,9 +15,13 @@ namespace MyService
         public double y;
         public double z;
         public double cr;
+        public string info;
+        public string priznak;
+
         public Point (Point point)
         {
             this.cr = point.cr;
+            this.info = point.info;
             this.x = point.x;
             this.y = point.y;
             this.z = point.z;
@@ -63,7 +67,7 @@ namespace MyService
             criterion_ = null;
         }
 
-        public int setCriterion ( Point[] arrayOfPoints, Method method)
+        public int setCriterion ( Point[] arrayOfPoints, Method method, bool debug=false)
         {
             double sumSquareOfIndication = 0;
             double sumOfIndication = 0;
@@ -72,12 +76,22 @@ namespace MyService
             {
                 if (isPointOfEllipse(arrayOfPoints[i]))
                 {
+                    if (debug)
+                    {
+                        Console.Write("cr " + arrayOfPoints[i].cr.ToString());
+                        Console.WriteLine(" info " + arrayOfPoints[i].info);
+                    }
+
                     sumSquareOfIndication +=  Math.Pow (arrayOfPoints[i].cr, 2);
                     sumOfIndication += arrayOfPoints[i].cr;
                     nIndication++;
                 }
 
             }
+
+            if (debug)
+                Console.WriteLine("SA " + (sumOfIndication / nIndication).ToString());
+
             criterion_ = (sumSquareOfIndication / nIndication) - Math.Pow(sumOfIndication / nIndication, 2); // For a while Variance only
             return 0;
         }
@@ -134,7 +148,7 @@ namespace MyService
 
 
                 TheBestEllipseOfPoint elSeek = new TheBestEllipseOfPoint(data.points, data.xElPos, data.yElPos, data.zElPos);
-                elSeek.setTheBestEllipses();
+                elSeek.ComputeTheBestEllipses();
                 ellipses=elSeek.getTheBestEllipses();
 
                 //for (int i = 0; i < ellipses1.Count(); i++)
