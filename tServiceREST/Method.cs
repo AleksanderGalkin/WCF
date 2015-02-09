@@ -6,6 +6,8 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Runtime.Serialization;
 using tServiceREST;
+using log4net;
+using log4net.Config;
 
 namespace MyService    
 {
@@ -43,11 +45,30 @@ namespace MyService
         [DataMember] public int zElPos { get; set; }
  
     };
+    [DataContract]
+    public class BmObj
+    {
+        [DataMember] public Point[] points { get; set; }
+        [DataMember] public int xElPos { get; set; }
+        [DataMember] public int yElPos { get; set; }
+        [DataMember] public int zElPos { get; set; }
 
-    
+    };
+
+    [DataContract]
+    public class DhBmObj
+    {
+        [DataMember]
+        public DhObj dh { get; set;}
+        [DataMember]
+        public BmObj bm { get; set; }
+    }
+
     [DataContract]
     public class Ellipse
     {
+        public static readonly ILog log = LogManager.GetLogger(typeof(Ellipse));
+
         [DataMember] public Point point { get; set; }
         [DataMember] public double trDipDir { get; set; }
         [DataMember] public double trDip { get; set; }
@@ -67,7 +88,7 @@ namespace MyService
             criterion_ = null;
         }
 
-        public int setCriterion ( Point[] arrayOfPoints, Method method, bool debug=false)
+        public int setCriterion ( Point[] arrayOfPoints, Method method)
         {
             double sumSquareOfIndication = 0;
             double sumOfIndication = 0;
@@ -76,12 +97,8 @@ namespace MyService
             {
                 if (isPointOfEllipse(arrayOfPoints[i]))
                 {
-                    if (debug)
-                    {
-                        Console.Write("cr " + arrayOfPoints[i].cr.ToString());
-                        Console.WriteLine(" info " + arrayOfPoints[i].info);
-                    }
-
+                    
+                    log.DebugFormat("Скважина - {0}, значение критерия - {1}", arrayOfPoints[i].info, arrayOfPoints[i].cr); 
                     sumSquareOfIndication +=  Math.Pow (arrayOfPoints[i].cr, 2);
                     sumOfIndication += arrayOfPoints[i].cr;
                     nIndication++;
@@ -89,10 +106,8 @@ namespace MyService
 
             }
 
-            if (debug)
-                Console.WriteLine("SA " + (sumOfIndication / nIndication).ToString());
-
             criterion_ = (sumSquareOfIndication / nIndication) - Math.Pow(sumOfIndication / nIndication, 2); // For a while Variance only
+            log.DebugFormat("Значение оценки для эллипса: {0}", criterion_);
             return 0;
         }
 
@@ -135,19 +150,25 @@ namespace MyService
             //BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "GetData/")]
 
-            Ellipse[] getData(DhObj data);
+            Ellipse[] getData(DhBmObj data);
         }
 
         public class MyService : IMyService
         {
-            public Ellipse[] getData(DhObj data)
+            public static readonly ILog log = LogManager.GetLogger(typeof(MyService));
+            public static readonly ILog logCon = LogManager.GetLogger("ConsoleAppender");
+
+            public Ellipse[] getData(DhBmObj data)
             {
-                
+
                // Ellipse[] ellipses1 = new Ellipse[data.points.Count()];
-                Ellipse[] ellipses = new Ellipse[data.points.Count()];
+                Ellipse[] ellipses = new Ellipse[data.bm.points.Count()];
 
+                log.DebugFormat("Объявлем класс TheBestEllipseOfPoint: кол-во ячеек - {0}, кол-во эллипсов вокруг: X - {1},"+
+                                "Y - {2}, Z - {3}", data.dh.points.Count(), data.dh.xElPos, data.dh.yElPos, data.dh.zElPos);
 
-                TheBestEllipseOfPoint elSeek = new TheBestEllipseOfPoint(data.points, data.xElPos, data.yElPos, data.zElPos);
+                TheBestEllipseOfPoint elSeek = new TheBestEllipseOfPoint(data.dh.points,data.bm.points, data.bm.xElPos, data.bm.yElPos, data.bm.zElPos);
+                log.Debug("Запускаем вычисление оптимальных эллипсов для каждой ячейки");
                 elSeek.ComputeTheBestEllipses();
                 ellipses=elSeek.getTheBestEllipses();
 
@@ -161,9 +182,23 @@ namespace MyService
                 //   // ellipses1[i].trDipDir = 211.06298167815987;
 
                 //}
+                for (int i = 0; i < data.bm.points.Count(); i++ )
+                {
+                    if (
+                          !(   ellipses[i].point.x == data.bm.points[i].x
+                            || ellipses[i].point.y == data.bm.points[i].y
+                            || ellipses[i].point.z == data.bm.points[i].z
+                            )
+                        )
+                    {
+                        log.Error ("Координаты входной БМ не соответствуют координатам результата");
+                        logCon.Error ("Координаты входной БМ не соответствуют координатам результата");
+                        return null;
+                    }
+                }
 
-                Console.WriteLine("Обработка");
-                Console.WriteLine("Отправленно "+ellipses.Count().ToString()+" эллипсов");
+                log.InfoFormat("Возвращено в вызывающий модуль {0} ячеек с параметрами эллипсов", ellipses.Count());
+                Console.WriteLine(String.Format("Возвращено в вызывающий модуль {0} ячеек с параметрами эллипсов", ellipses.Count()));
                 return ellipses;
             }
         }

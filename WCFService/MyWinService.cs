@@ -7,15 +7,19 @@ using System.ServiceProcess.Design;
 using System.ComponentModel;
 using System.ServiceModel;
 using System.ServiceModel.Web;
+using log4net;
+using log4net.Config;
 
 namespace WindowsService
 {
     public class WFCService : System.ServiceProcess.ServiceBase
     {
 
+        
+        public static readonly ILog log = LogManager.GetLogger(typeof(WFCService));
+        public static readonly ILog logCon = LogManager.GetLogger("ConsoleAppender");
+        
         private ProjectInstaller projectInstaller2;
-        private System.Diagnostics.EventLog eLog;
-
         public WFCService()
         {
             this.ServiceName = "MyWFCService";
@@ -27,15 +31,8 @@ namespace WindowsService
 
         private void InitializeComponent()
         {
-            this.eLog = new System.Diagnostics.EventLog();
+            log4net.Config.XmlConfigurator.Configure();
             this.projectInstaller2 = new ProjectInstaller();
-            ((System.ComponentModel.ISupportInitialize)(this.eLog)).BeginInit();
-            // 
-            // eLog
-            // 
-            this.eLog.EntryWritten += new System.Diagnostics.EntryWrittenEventHandler(this.eLog_EntryWritten);
-            ((System.ComponentModel.ISupportInitialize)(this.eLog)).EndInit();
-
         }
 
         public static void Main(string[] args)
@@ -45,11 +42,9 @@ namespace WindowsService
             if (Environment.UserInteractive)
             {
                 service.OnStart(args);
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine("Сервис получения оптимального эллипса поиска");
-                Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine("Press Enter key to stop program");
                 Console.Read();
+                
                 service.OnStop();
             }
             else
@@ -73,31 +68,21 @@ namespace WindowsService
             Uri ServiceURI = new Uri(URI);
             WebServiceHost host = new WebServiceHost(ServiceType, ServiceURI);
             host.Open();
-            AddLog("start");
+            log.Info("Запустили сервис");
+            logCon.Info("Запустили сервис");
         }
 
         protected override void OnStop()
         {
-            AddLog("stop");
+            log.Info("Останавливаем сервис");
+            logCon.Info("Останавливаем сервис");
         }
 
-        public void AddLog(string log)
-        {
-            try
-            {
-                if (!EventLog.SourceExists("MyWFCService"))
-                {
-                    EventLog.CreateEventSource("MyWFCService", "MyWFCService");
-                }
-                eLog.Source = "MyWFCService";
-                eLog.WriteEntry(log);
-            }
-            catch { }
-        }
-        private void eLog_EntryWritten(object sender, EntryWrittenEventArgs e)
-        {
+      
+        //private void eLog_EntryWritten(object sender, EntryWrittenEventArgs e)
+        //{
 
-        }
+        //}
 
 
 

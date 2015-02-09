@@ -3,14 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MyService;
+using log4net;
+using log4net.Config;
 
 namespace tServiceREST
 {
 
     class TheBestEllipseOfPoint
     {
-        private Point[]         points_;
-        private Point[][][][]   rotatedPointsOfPoints_;
+        public static readonly ILog log = LogManager.GetLogger(typeof(Ellipse));
+        private Point[]         dhPoints_;
+        private Point[]         bmPoints_;
+        private Point[][][][]   rotatedPointsOfDhPoints_;
+        private Point[][][][]   rotatedPointsOfBmPoints_;
         private Ellipse[]       theBestEllipses_;
         private double          angleX_;
         private int             nElipsX_;
@@ -24,16 +29,17 @@ namespace tServiceREST
         public int              axisEllipseC { get; set; }
 
 
-        public TheBestEllipseOfPoint(Point[] points,int nElpsX, int nElpsY, int nElpsZ)
+        public TheBestEllipseOfPoint(Point[] dhPoints, Point[] bmPoints, int nElpsX, int nElpsY, int nElpsZ)
         {
 
             axisEllipseA = 15;
             axisEllipseB = 10;
             axisEllipseC = 10;
 
-            theBestEllipses_ = new Ellipse[points.Count()];
+            theBestEllipses_ = new Ellipse[bmPoints.Count()];
 
-            points_  = points;
+            dhPoints_  = dhPoints;
+            bmPoints_  = bmPoints;
             nElipsX_ = nElpsX;
             nElipsY_ = nElpsY;
             nElipsZ_ = nElpsZ;
@@ -42,22 +48,22 @@ namespace tServiceREST
             angleZ_  = 6.2831853072 / (nElipsZ_*2);
             int numElipsCombination = nElipsX_ * nElipsY_ * nElipsZ_;
 
-            Console.WriteLine("Формирование массива повернутых точек");
+            log.Debug("Формирование массива повернутых точек");
 
-            rotatedPointsOfPoints_ = new Point[points_.Count()][][][];  //массив поворотов точек
-            for (int i = 0; i < rotatedPointsOfPoints_.Count();i++ )
+            rotatedPointsOfDhPoints_ = new Point[dhPoints_.Count()][][][];  //массив поворотов точек скважин
+            for (int i = 0; i < rotatedPointsOfDhPoints_.Count();i++ )
             {
-                rotatedPointsOfPoints_[i] = new Point[nElipsX_][][]; // для каждой точки массив поворотов вокруг оси X 
+                rotatedPointsOfDhPoints_[i] = new Point[nElipsX_][][]; // для каждой точки массив поворотов вокруг оси X 
 
                 for (int ix = 0; ix < nElipsX_; ix++ )
                 {
-                    rotatedPointsOfPoints_[i][ix] = new Point[nElipsY_][]; // для каждго поворота вокруг оси X создаём массив поворотов вокруг оси Y
+                    rotatedPointsOfDhPoints_[i][ix] = new Point[nElipsY_][]; // для каждго поворота вокруг оси X создаём массив поворотов вокруг оси Y
                     for (int iy = 0; iy < nElipsY_; iy++ )
                     {
-                        rotatedPointsOfPoints_[i][ix][iy] = new Point[nElipsZ_]; // для каждго поворота вокруг оси Y создаём массив поворотов вокруг оси Z
+                        rotatedPointsOfDhPoints_[i][ix][iy] = new Point[nElipsZ_]; // для каждго поворота вокруг оси Y создаём массив поворотов вокруг оси Z
                          for (int iz = 0; iz < nElipsZ_; iz++ )
                          {
-                             rotatedPointsOfPoints_[i][ix][iy][iz] = getRotatedPoint(   points[i],
+                             rotatedPointsOfDhPoints_[i][ix][iy][iz] = getRotatedPoint(   dhPoints[i],
                                                                                         angleX_ * ix,
                                                                                         angleY_ * iy,
                                                                                         angleZ_ * iz
@@ -67,6 +73,28 @@ namespace tServiceREST
                 }
             }
 
+            rotatedPointsOfBmPoints_ = new Point[bmPoints_.Count()][][][];  //массив поворотов точек скважин
+            for (int i = 0; i < rotatedPointsOfBmPoints_.Count(); i++)
+            {
+                rotatedPointsOfBmPoints_[i] = new Point[nElipsX_][][]; // для каждой точки массив поворотов вокруг оси X 
+
+                for (int ix = 0; ix < nElipsX_; ix++)
+                {
+                    rotatedPointsOfBmPoints_[i][ix] = new Point[nElipsY_][]; // для каждго поворота вокруг оси X создаём массив поворотов вокруг оси Y
+                    for (int iy = 0; iy < nElipsY_; iy++)
+                    {
+                        rotatedPointsOfBmPoints_[i][ix][iy] = new Point[nElipsZ_]; // для каждго поворота вокруг оси Y создаём массив поворотов вокруг оси Z
+                        for (int iz = 0; iz < nElipsZ_; iz++)
+                        {
+                            rotatedPointsOfBmPoints_[i][ix][iy][iz] = getRotatedPoint(bmPoints[i],
+                                                                                       angleX_ * ix,
+                                                                                       angleY_ * iy,
+                                                                                       angleZ_ * iz
+                                                                                   );
+                        }
+                    }
+                }
+            }
 
 
         }
@@ -123,7 +151,7 @@ namespace tServiceREST
         public int ComputeTheBestEllipses()
         {
             Console.WriteLine("Ищем лучший эллипс для точек:");
-            for (int i=0; i < points_.Count(); i++)
+            for (int i=0; i < bmPoints_.Count(); i++)
             {
                    theBestEllipses_[i] = computeTheBestEllipseForPoint(i);
                 if (i%100==0)
@@ -135,8 +163,10 @@ namespace tServiceREST
 
         private Ellipse computeTheBestEllipseForPoint (int pIndex)
         {
-            Point[][][] rtdPntsSet=rotatedPointsOfPoints_[pIndex];
-            Ellipse eRes = new Ellipse(points_[pIndex], axisEllipseA, axisEllipseB, axisEllipseC);
+            log.DebugFormat("Оценка эллипсов вокруг ячейки {0}",pIndex);
+            log.Debug("------------------------------------");
+            Point[][][] rtdPntsSet=rotatedPointsOfBmPoints_[pIndex];
+            Ellipse eRes = new Ellipse(bmPoints_[pIndex], axisEllipseA, axisEllipseB, axisEllipseC);
             double? curCriterrion = 99999;
             double? theBestCriterion = 99999;
             int noRotationX = 0;
@@ -149,20 +179,16 @@ namespace tServiceREST
                     for (int iz = 0; iz < rtdPntsSet[ix][iy].Count(); iz++)
                     {
                         Ellipse e = new Ellipse(rtdPntsSet[ix][iy][iz], axisEllipseA, axisEllipseB, axisEllipseC);
-                        Point[] oneRotationPoints=new Point[rotatedPointsOfPoints_.Count()];
-                        for (int i = 0; i<rotatedPointsOfPoints_.Count(); i++)
+                        Point[] oneRotationPoints=new Point[rotatedPointsOfDhPoints_.Count()];
+                        for (int i = 0; i<rotatedPointsOfDhPoints_.Count(); i++)
                         {
-                            oneRotationPoints[i]=rotatedPointsOfPoints_[i][ix][iy][iz];
+                            oneRotationPoints[i]=rotatedPointsOfDhPoints_[i][ix][iy][iz];
                         }
-                        e.setCriterion(oneRotationPoints, Ellipse.Method.Variance, pIndex==4?true:false);
+                        e.setCriterion(oneRotationPoints, Ellipse.Method.Variance);
                         curCriterrion=e.getCriterion();
 
-                        if (pIndex == 4)
-                        {
-                            Console.WriteLine(" поворот " + ix.ToString() + " , " + iy.ToString() + " , " + iz.ToString());
-                            Console.WriteLine(" curCriterrion " + curCriterrion.ToString());
-                        }
-
+                        log.DebugFormat("Поворот {0}-{1}-{2} , критерий оценки {3}", ix, iy,iz,curCriterrion);
+   
                         if (curCriterrion < theBestCriterion)
                         {
                             theBestCriterion = curCriterrion;
@@ -174,33 +200,17 @@ namespace tServiceREST
                 }
             }
 
-            if (pIndex == 4)
-            {
-                Console.WriteLine(" Лучший поворот " + noRotationX.ToString() + " , " + noRotationY.ToString() + " , " + noRotationZ.ToString());
-                Console.WriteLine(" Лучший curCriterrion " + theBestCriterion.ToString());
-            }
-
-            if (pIndex == 4)
-            { ;}
-
-
-            eRes.trDipDir = getTrueDipDirection(angleX_ * noRotationX,
+           log.DebugFormat(" Лучший поворот {0}-{1}-{2},  критерий оценки {3}", noRotationX, noRotationY, noRotationZ, theBestCriterion);
+           eRes.trDipDir = getTrueDipDirection(angleX_ * noRotationX,
                                                 angleY_ * noRotationY,
                                                 angleZ_ * noRotationZ
                                                 );
 
-            
-            eRes.trDip = getTrueDip(
+           eRes.trDip = getTrueDip(
                                     angleX_ * noRotationX,
                                     angleY_ * noRotationY,
                                     angleZ_ * noRotationZ
                                     );
-
-
-            //if (double.IsNaN(eRes.trDipDir))  // решить потом эту проблемму
-            //    eRes.trDipDir = 360;
-            //if (double.IsNaN(eRes.trDip))
-            //    eRes.trDip = 360;
 
             return eRes;
         }
