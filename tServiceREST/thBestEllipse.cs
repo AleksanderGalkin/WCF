@@ -24,17 +24,19 @@ namespace tServiceREST
         private double          angleZ_;
         private int             nElipsZ_;
 
-        public int              axisEllipseA { get; set; }
-        public int              axisEllipseB { get; set; }
-        public int              axisEllipseC { get; set; }
+        public double              axisEllipseA { get; set; }
+        public double              axisEllipseB { get; set; }
+        public double              axisEllipseC { get; set; }
+        public int                 minVariancePoints { get; set; }
 
 
-        public TheBestEllipseOfPoint(Point[] dhPoints, Point[] bmPoints, int nElpsX, int nElpsY, int nElpsZ)
+        public TheBestEllipseOfPoint(Point[] dhPoints, Point[] bmPoints, int xAxis, int yAxis, int zAxis, int nElpsX, int nElpsY, int nElpsZ)
         {
 
-            axisEllipseA = 15;
-            axisEllipseB = 10;
-            axisEllipseC = 10;
+            axisEllipseA = xAxis;
+            axisEllipseB = yAxis;
+            axisEllipseC = zAxis;
+            minVariancePoints = 4;
 
             theBestEllipses_ = new Ellipse[bmPoints.Count()];
 
@@ -48,7 +50,7 @@ namespace tServiceREST
             angleZ_  = 6.2831853072 / (nElipsZ_*2);
             int numElipsCombination = nElipsX_ * nElipsY_ * nElipsZ_;
 
-            log.Debug("Формирование массива повернутых точек");
+            log.Debug("Формирование массива повернутых скважин");
 
             rotatedPointsOfDhPoints_ = new Point[dhPoints_.Count()][][][];  //массив поворотов точек скважин
             for (int i = 0; i < rotatedPointsOfDhPoints_.Count();i++ )
@@ -72,7 +74,7 @@ namespace tServiceREST
                     }
                 }
             }
-
+            log.Debug("Формирование массива повернутых ячеек блочной модели");
             rotatedPointsOfBmPoints_ = new Point[bmPoints_.Count()][][][];  //массив поворотов точек скважин
             for (int i = 0; i < rotatedPointsOfBmPoints_.Count(); i++)
             {
@@ -150,7 +152,6 @@ namespace tServiceREST
 
         public int ComputeTheBestEllipses()
         {
-            Console.WriteLine("Ищем лучший эллипс для точек:");
             for (int i=0; i < bmPoints_.Count(); i++)
             {
                    theBestEllipses_[i] = computeTheBestEllipseForPoint(i);
@@ -163,7 +164,7 @@ namespace tServiceREST
 
         private Ellipse computeTheBestEllipseForPoint (int pIndex)
         {
-            log.DebugFormat("Оценка эллипсов вокруг ячейки {0}",pIndex);
+            log.DebugFormat("Начали оценку эллипсов вокруг ячейки {0}",pIndex);
             log.Debug("------------------------------------");
             Point[][][] rtdPntsSet=rotatedPointsOfBmPoints_[pIndex];
             Ellipse eRes = new Ellipse(bmPoints_[pIndex], axisEllipseA, axisEllipseB, axisEllipseC);
@@ -172,35 +173,43 @@ namespace tServiceREST
             int noRotationX = 0;
             int noRotationY = 0;
             int noRotationZ = 0;
-            for (int ix = 0; ix < rtdPntsSet.Count(); ix++)
+            for (double multAxises = 1; multAxises < 1.6 && theBestCriterion==99999; multAxises = multAxises + 0.2)
             {
-                for (int iy = 0; iy < rtdPntsSet[ix].Count(); iy++)
+                for (int ix = 0; ix < rtdPntsSet.Count(); ix++)
                 {
-                    for (int iz = 0; iz < rtdPntsSet[ix][iy].Count(); iz++)
+                    for (int iy = 0; iy < rtdPntsSet[ix].Count(); iy++)
                     {
-                        Ellipse e = new Ellipse(rtdPntsSet[ix][iy][iz], axisEllipseA, axisEllipseB, axisEllipseC);
-                        Point[] oneRotationPoints=new Point[rotatedPointsOfDhPoints_.Count()];
-                        for (int i = 0; i<rotatedPointsOfDhPoints_.Count(); i++)
+                        for (int iz = 0; iz < rtdPntsSet[ix][iy].Count(); iz++)
                         {
-                            oneRotationPoints[i]=rotatedPointsOfDhPoints_[i][ix][iy][iz];
-                        }
-                        e.setCriterion(oneRotationPoints, Ellipse.Method.Variance);
-                        curCriterrion=e.getCriterion();
+                            Ellipse e = new Ellipse(rtdPntsSet[ix][iy][iz],
+                                                    axisEllipseA * multAxises,
+                                                    axisEllipseB * multAxises,
+                                                    axisEllipseC * multAxises);
+                            Point[] oneRotationPoints = new Point[rotatedPointsOfDhPoints_.Count()];
+                            for (int i = 0; i < rotatedPointsOfDhPoints_.Count(); i++)
+                            {
+                                oneRotationPoints[i] = rotatedPointsOfDhPoints_[i][ix][iy][iz];
+                            }
+                            e.setCriterion(oneRotationPoints, Ellipse.Method.Variance);
+                            curCriterrion = e.getCriterion();
 
-                        log.DebugFormat("Поворот {0}-{1}-{2} , критерий оценки {3}", ix, iy,iz,curCriterrion);
-   
-                        if (curCriterrion < theBestCriterion)
-                        {
-                            theBestCriterion = curCriterrion;
-                            noRotationX = ix;
-                            noRotationY = iy;
-                            noRotationZ = iz;
+                            log.DebugFormat("Посчитан поворот {0}-{1}-{2} , критерий оценки {3}, кол-во точек Variance {4}", ix, iy, iz, curCriterrion,e.getNumberIndication());
+
+                            bool isCurCriterionIsTheBest = curCriterrion < theBestCriterion;
+                            bool isCurCriterionNumPointsMoreMinVPoints = e.getNumberIndication() >= minVariancePoints;
+                            if (isCurCriterionIsTheBest && isCurCriterionNumPointsMoreMinVPoints)
+                            {
+                                theBestCriterion = curCriterrion;
+                                noRotationX = ix;
+                                noRotationY = iy;
+                                noRotationZ = iz;
+                            }
+
                         }
                     }
                 }
             }
-
-           log.DebugFormat(" Лучший поворот {0}-{1}-{2},  критерий оценки {3}", noRotationX, noRotationY, noRotationZ, theBestCriterion);
+           log.DebugFormat(" Лучший поворот эллипса {0}-{1}-{2},  критерий оценки {3}", noRotationX, noRotationY, noRotationZ, theBestCriterion);
            eRes.trDipDir = getTrueDipDirection(angleX_ * noRotationX,
                                                 angleY_ * noRotationY,
                                                 angleZ_ * noRotationZ
@@ -211,8 +220,9 @@ namespace tServiceREST
                                     angleY_ * noRotationY,
                                     angleZ_ * noRotationZ
                                     );
-
-            return eRes;
+           log.DebugFormat("Истинный поворот эллипса: угол направления простирания {0}, угол падения {1}", eRes.trDipDir, eRes.trDip);
+           log.Debug("--------------------------------------");
+           return eRes;
         }
 
 
@@ -229,11 +239,15 @@ namespace tServiceREST
                 XYProjectionOfReversedXVektor.z = 10;
             }
 
-            double scalarProduct = azimuth.x * XYProjectionOfReversedXVektor.x + azimuth.y * XYProjectionOfReversedXVektor.y + azimuth.z * XYProjectionOfReversedXVektor.z;
-            double scalarVektor1 = Math.Sqrt(Math.Pow(azimuth.x, 2) + Math.Pow(azimuth.y, 2) + Math.Pow(azimuth.z, 2));
-            double scalarVektor2 = Math.Sqrt(Math.Pow(XYProjectionOfReversedXVektor.x, 2) + Math.Pow(XYProjectionOfReversedXVektor.y, 2) + Math.Pow(XYProjectionOfReversedXVektor.z, 2));
-            double radAngleAz = Math.Acos(scalarProduct / (scalarVektor1 * scalarVektor2));
+            double pseudoScalarProduct = XYProjectionOfReversedXVektor.x * azimuth.y - azimuth.x * XYProjectionOfReversedXVektor.y;
+            double scalarVektor1 = Math.Sqrt(Math.Pow(azimuth.x, 2) + Math.Pow(azimuth.y, 2) );
+            double scalarVektor2 = Math.Sqrt(Math.Pow(XYProjectionOfReversedXVektor.x, 2) + Math.Pow(XYProjectionOfReversedXVektor.y, 2) );
+            double radAngleAz = Math.Asin(pseudoScalarProduct / (scalarVektor1 * scalarVektor2));
             double degreeAngleAz = radAngleAz * 180 / Math.PI;
+            if (degreeAngleAz < 0)
+            {
+                degreeAngleAz = 360 + degreeAngleAz;
+            }
 
 
             return degreeAngleAz;
@@ -247,14 +261,18 @@ namespace tServiceREST
 
             if (isNullVector(ZYProjectionOfReversedXVektor))
             {
-                ZYProjectionOfReversedXVektor.x = 10;
+                ZYProjectionOfReversedXVektor.y = 10;
             }
 
-            double scalarProduct = azimuth.x * ZYProjectionOfReversedXVektor.x + azimuth.y * ZYProjectionOfReversedXVektor.y + azimuth.z * ZYProjectionOfReversedXVektor.z;
-            double scalarVektor1 = Math.Sqrt(Math.Pow(azimuth.x, 2) + Math.Pow(azimuth.y, 2) + Math.Pow(azimuth.z, 2));
-            double scalarVektor2 = Math.Sqrt(Math.Pow(ZYProjectionOfReversedXVektor.x, 2) + Math.Pow(ZYProjectionOfReversedXVektor.y, 2) + Math.Pow(ZYProjectionOfReversedXVektor.z, 2));
-            double radAngleAz = Math.Acos(scalarProduct / (scalarVektor1 * scalarVektor2));
+            double pseudoScalarProduct = ZYProjectionOfReversedXVektor.y * azimuth.z - azimuth.y * ZYProjectionOfReversedXVektor.z;
+            double scalarVektor1 = Math.Sqrt(Math.Pow(azimuth.y, 2) + Math.Pow(azimuth.z, 2) );
+            double scalarVektor2 = Math.Sqrt(Math.Pow(ZYProjectionOfReversedXVektor.y, 2) + Math.Pow(ZYProjectionOfReversedXVektor.z, 2));
+            double radAngleAz = Math.Asin(pseudoScalarProduct / (scalarVektor1 * scalarVektor2));
             double degreeAngleAz = radAngleAz * 180 / Math.PI;
+            if (degreeAngleAz < 0)
+            {
+                degreeAngleAz = 360 + degreeAngleAz;
+            }
 
             return degreeAngleAz;
         }

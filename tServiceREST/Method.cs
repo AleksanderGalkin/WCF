@@ -49,6 +49,9 @@ namespace MyService
     public class BmObj
     {
         [DataMember] public Point[] points { get; set; }
+        [DataMember] public int xAxis { get; set; }
+        [DataMember] public int yAxis { get; set; }
+        [DataMember] public int zAxis { get; set; }
         [DataMember] public int xElPos { get; set; }
         [DataMember] public int yElPos { get; set; }
         [DataMember] public int zElPos { get; set; }
@@ -74,18 +77,23 @@ namespace MyService
         [DataMember] public double trDip { get; set; }
 
         public enum Method { Variance, Median }
-        private double? criterion_ { get; set; }
-        private int axisEllipseA_ { get; set; }
-        private int axisEllipseB_ { get; set; }
-        private int axisEllipseC_ { get; set; }
 
-         public Ellipse(Point pPoint, int axisEllipseA, int axisEllipseB, int axisEllipseC)
+        private double? criterion_ { get; set; }
+        private int? nIndication_ { get; set; }
+
+        private double axisEllipseA_ { get; set; }
+        private double axisEllipseB_ { get; set; }
+        private double axisEllipseC_ { get; set; }
+
+
+        public Ellipse(Point pPoint, double axisEllipseA, double axisEllipseB, double axisEllipseC)
         {
             point = pPoint;
             axisEllipseA_ = axisEllipseA;
             axisEllipseB_ = axisEllipseB;
             axisEllipseC_ = axisEllipseC;
             criterion_ = null;
+            nIndication_ = null;
         }
 
         public int setCriterion ( Point[] arrayOfPoints, Method method)
@@ -97,9 +105,9 @@ namespace MyService
             {
                 if (isPointOfEllipse(arrayOfPoints[i]))
                 {
-                    
-                    log.DebugFormat("Скважина - {0}, значение критерия - {1}", arrayOfPoints[i].info, arrayOfPoints[i].cr); 
-                    sumSquareOfIndication +=  Math.Pow (arrayOfPoints[i].cr, 2);
+
+                    log.DebugFormat("Скважина - {0}, значение критерия - {1}", arrayOfPoints[i].info, arrayOfPoints[i].cr);
+                    sumSquareOfIndication += Math.Pow(arrayOfPoints[i].cr, 2);
                     sumOfIndication += arrayOfPoints[i].cr;
                     nIndication++;
                 }
@@ -107,6 +115,8 @@ namespace MyService
             }
 
             criterion_ = (sumSquareOfIndication / nIndication) - Math.Pow(sumOfIndication / nIndication, 2); // For a while Variance only
+            nIndication_ = nIndication;
+
             log.DebugFormat("Значение оценки для эллипса: {0}", criterion_);
             return 0;
         }
@@ -116,17 +126,24 @@ namespace MyService
             return criterion_;
         }
 
+        public double? getNumberIndication()
+        {
+            return nIndication_;
+        }
+
         bool isPointOfEllipse(Point parPoint)
         {
 
             double radicalExpression = 1 - (Math.Pow(parPoint.x - point.x, 2) / Math.Pow(axisEllipseA_, 2))
                                             - (Math.Pow(parPoint.z - point.z, 2) / Math.Pow(axisEllipseC_, 2));
+            
             if (radicalExpression < 0)
             {
                 return false;
             }
             double topFunctionOfXY = point.y + axisEllipseB_ * Math.Sqrt(radicalExpression);
             double bottomFunctionOfXY = point.y - axisEllipseB_ * Math.Sqrt(radicalExpression);
+
             if (parPoint.y >=  bottomFunctionOfXY && parPoint.y <= topFunctionOfXY)
             {
                 return true;
@@ -164,24 +181,14 @@ namespace MyService
                // Ellipse[] ellipses1 = new Ellipse[data.points.Count()];
                 Ellipse[] ellipses = new Ellipse[data.bm.points.Count()];
 
-                log.DebugFormat("Объявлем класс TheBestEllipseOfPoint: кол-во ячеек - {0}, кол-во эллипсов вокруг: X - {1},"+
-                                "Y - {2}, Z - {3}", data.dh.points.Count(), data.dh.xElPos, data.dh.yElPos, data.dh.zElPos);
+                log.DebugFormat("Объявлем класс TheBestEllipseOfPoint: кол-во скважин - {0},кол-во ячеек БМ - {1},размер полуосей:{2}-{3}-{4} кол-во эллипсов вокруг: X - {5}," +
+                                "Y - {6}, Z - {7}", data.dh.points.Count(), data.bm.points.Count(), data.bm.xAxis, data.bm.yAxis, data.bm.zAxis, data.dh.xElPos, data.dh.yElPos, data.dh.zElPos);
 
-                TheBestEllipseOfPoint elSeek = new TheBestEllipseOfPoint(data.dh.points,data.bm.points, data.bm.xElPos, data.bm.yElPos, data.bm.zElPos);
+                TheBestEllipseOfPoint elSeek = new TheBestEllipseOfPoint(data.dh.points, data.bm.points, data.bm.xAxis, data.bm.yAxis, data.bm.zAxis, data.bm.xElPos, data.bm.yElPos, data.bm.zElPos);
                 log.Debug("Запускаем вычисление оптимальных эллипсов для каждой ячейки");
                 elSeek.ComputeTheBestEllipses();
                 ellipses=elSeek.getTheBestEllipses();
 
-                //for (int i = 0; i < ellipses1.Count(); i++)
-                //{
-                //    //ellipses1[i] = new Ellipse(data.points[i], 15, 10, 10);
-                //    ellipses1[i] = ellipses[i];
-                //    d1[i] = ellipses[i].trDipDir;
-                //    d2[i] = ellipses[i].trDip;
-                //   // ellipses1[i].trDip = 14.174204666693806;
-                //   // ellipses1[i].trDipDir = 211.06298167815987;
-
-                //}
                 for (int i = 0; i < data.bm.points.Count(); i++ )
                 {
                     if (
@@ -197,8 +204,8 @@ namespace MyService
                     }
                 }
 
-                log.InfoFormat("Возвращено в вызывающий модуль {0} ячеек с параметрами эллипсов", ellipses.Count());
-                Console.WriteLine(String.Format("Возвращено в вызывающий модуль {0} ячеек с параметрами эллипсов", ellipses.Count()));
+                log.InfoFormat("Возвращено в вызывающий модуль {0} ячеек БМ с параметрами эллипсов", ellipses.Count());
+                Console.WriteLine(String.Format("Возвращено в вызывающий модуль {0} ячеек БМ с параметрами эллипсов", ellipses.Count()));
                 return ellipses;
             }
         }
