@@ -5,12 +5,14 @@ using System.Text;
 using MyService;
 using log4net;
 using log4net.Config;
+using System.ComponentModel;
 
 namespace tServiceREST
 {
 
     class TheBestEllipseOfPoint
     {
+        public int idxThreat { get; set; }
         public static readonly ILog log = LogManager.GetLogger(typeof(Ellipse));
         private Point[]         dhPoints_;
         private Point[]         bmPoints_;
@@ -150,16 +152,20 @@ namespace tServiceREST
             return resultPoint;
         }
 
-        public int ComputeTheBestEllipses()
+        public void ComputeTheBestEllipses(BackgroundWorker threat)
         {
-            for (int i=0; i < bmPoints_.Count(); i++)
+            int count = bmPoints_.Count();
+            for (int i = 0; i < count; i++)
             {
                    theBestEllipses_[i] = computeTheBestEllipseForPoint(i);
-                if (i%100==0)
-                    Console.WriteLine("Точка: "+ i.ToString()+" Найдено.");
+                   if (i % 50 == 0 || i == count-1)
+                   {
+                       //Console.WriteLine("Точка: "+ i.ToString()+" Найдено.");
+                       int percent = (int)(100.0 / count * (i + 1));
+                       threat.ReportProgress(percent, this.idxThreat);
+                   }
             }
 
-            return 0;
         }
 
         private Ellipse computeTheBestEllipseForPoint (int pIndex)

@@ -65,7 +65,6 @@ var writeResultToFile = function (filePath, data) {
     var oDmFile = new ActiveXObject("DmFile.DmTableADO");
     oDmFile.Open(filePath, false);
     var i = 0;
-    alert(oDmFile.Schema.GetFieldName("TRDIPDIR"));
     for (oDmFile.MoveFirst(); !oDmFile.EOF; oDmFile.MoveNext(), i++) {
 
         oDmFile.SetNamedColumn("TRDIPDIR", data[i].trDipDir);
