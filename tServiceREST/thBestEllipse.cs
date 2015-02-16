@@ -152,7 +152,7 @@ namespace tServiceREST
             return resultPoint;
         }
 
-        public void ComputeTheBestEllipses(BackgroundWorker threat)
+        public void ComputeTheBestEllipses()
         {
             int count = bmPoints_.Count();
             for (int i = 0; i < count; i++)
@@ -160,9 +160,8 @@ namespace tServiceREST
                    theBestEllipses_[i] = computeTheBestEllipseForPoint(i);
                    if (i % 50 == 0 || i == count-1)
                    {
-                       //Console.WriteLine("Точка: "+ i.ToString()+" Найдено.");
-                       int percent = (int)(100.0 / count * (i + 1));
-                       threat.ReportProgress(percent, this.idxThreat);
+                       Console.WriteLine("Точка: "+ i.ToString()+" Найдено.");
+                       
                    }
             }
 

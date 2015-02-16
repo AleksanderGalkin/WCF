@@ -67,6 +67,7 @@ namespace WindowsService
             Type ServiceType=typeof(MyService.MyService);
             Uri ServiceURI = new Uri(URI);
             WebServiceHost host = new WebServiceHost(ServiceType, ServiceURI);
+           
             host.Open();
             log.Info("Запустили сервис");
             logCon.Info("Запустили сервис");
