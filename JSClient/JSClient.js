@@ -21,26 +21,6 @@ var BMtable = function (filePath, xAxis, yAxis, zAxis, xElPos, yElPos, zElPos) {
     var oDmFile = new ActiveXObject("DmFile.DmTableADO");
     oDmFile.Open(filePath, false);
 
-//    var haveTrDipDir = false;
-//    var haveTrDip = false;
-//    for (var i = 1; i <= oDmFile.Schema.FieldCount; i++) {
-
-//        if (oDmFile.Schema.GetFieldName(i) == "TRDIPDIR") {
-//            haveTrDipDir = true;
-//        }
-//        if (oDmFile.Schema.GetFieldName(i) == "TRDIP") {
-//            haveTrDip = true;
-//        }
-//    }
-//    if (!haveTrDipDir) {
-//        oDmFile.Schema.AddColumn("TRDIPDIR", 2);
-//    }
-//    if (!haveTrDip) {
-//        oDmFile.Schema.AddColumn("TRDIP", 2);
-//    }
-//    oDmFile.Close();
-//    return;
-
     this.points = [];
     this.xAxis = yAxis;  //оси x и y меняем местами, так как расчет эллипса происходит относительно оси x
     this.yAxis = xAxis;  // в расчете x это полуось a, y - полуось b

@@ -78,14 +78,5 @@ namespace WindowsService
             log.Info("Останавливаем сервис");
             logCon.Info("Останавливаем сервис");
         }
-
-      
-        //private void eLog_EntryWritten(object sender, EntryWrittenEventArgs e)
-        //{
-
-        //}
-
-
-
     }
 }

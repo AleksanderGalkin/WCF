@@ -282,12 +282,6 @@ namespace tServiceREST
             return degreeAngleAz;
         }
 
-        //Point getPointOfAxisXOrientedVektor (Point point)
-        //{
-        //    Point resPoint = new Point (point);
-        //    resPoint.x = resPoint.x + 10;
-        //    return resPoint;
-        //}
 
         Point getXYProjection (Point point, Point planePoint)
         {
@@ -333,15 +327,6 @@ namespace tServiceREST
             }
 
         }
-
-        //Point getVektor(Point point1, Point point2)
-        //{
-        //    Point resPoint = new Point();
-        //    resPoint.x = point2.x - point1.x;
-        //    resPoint.y = point2.y - point1.y;
-        //    resPoint.z = point2.z - point1.z;
-        //    return resPoint;
-        //}
 
         public Ellipse[] getTheBestEllipses()
         {
