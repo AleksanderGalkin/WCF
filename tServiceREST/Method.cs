@@ -40,6 +40,43 @@ namespace MyService
             z = 0;
         }
     }
+
+    public class Counter
+    {
+        private int count_;
+        private int totalAllThreats_;
+        private object locker = new object();
+
+
+        public Counter(int totalAllThreats)
+        {
+            totalAllThreats_ = totalAllThreats;
+            count_ = 0;
+        }
+        public int getCount()
+        {
+            return count_;
+        }
+        public int getPercent()
+        {
+            return (int)(100.0/totalAllThreats_*count_);
+        }
+        public void setCount(int count)
+        {
+            lock (locker)
+            {
+                count_ = count;
+            }
+        }
+        public void increaseCount(int count)
+        {
+            lock (locker)
+            {
+                count_ += count;
+            }
+        }
+    }
+
     [DataContract]
     public class DhObj
     {
@@ -218,6 +255,7 @@ namespace MyService
             private DhBmObj inData_;
             private Progress[] progress_;
 
+            
             public Ellipse[] startCalculation(DhBmObj data)
             {
 
@@ -226,6 +264,8 @@ namespace MyService
                 progress_ = new Progress[nTread_];
                 theBestEllipseOfPoint_ = new TheBestEllipseOfPoint[nTread_];
                 Thread[] threads=new Thread[nTread_];
+                Counter counter = new Counter(inData_.bm.points.Count());
+                Console.WriteLine("Количество параллельных потоков: " + nTread_ );
                 for (int i = 0; i < nTread_; i++)
                 {
                     
@@ -234,7 +274,7 @@ namespace MyService
                     log.DebugFormat("Объявлем класс TheBestEllipseOfPoint (поток {6}): кол-во скважин - {0},кол-во ячеек БМ - {1},размер полуосей:{2}-{3}-{4} кол-во эллипсов вокруг: X - {5}," +
                                     "Y - {6}, Z - {7}", inData_.dh.points.Count(), bmObjs[i].points.Count(), bmObjs[i].xAxis, bmObjs[i].yAxis, bmObjs[i].zAxis, bmObjs[i].xElPos, bmObjs[i].yElPos, bmObjs[i].zElPos, i);
 
-                    theBestEllipseOfPoint_[i] = new TheBestEllipseOfPoint(inData_.dh.points, bmObjs[i].points, bmObjs[i].xAxis, bmObjs[i].yAxis, bmObjs[i].zAxis, bmObjs[i].xElPos, bmObjs[i].yElPos, bmObjs[i].zElPos);
+                    theBestEllipseOfPoint_[i] = new TheBestEllipseOfPoint(inData_.dh.points, bmObjs[i].points, bmObjs[i].xAxis, bmObjs[i].yAxis, bmObjs[i].zAxis, bmObjs[i].xElPos, bmObjs[i].yElPos, bmObjs[i].zElPos,counter);
                     threads[i].IsBackground = true;
                     threads[i].Start(theBestEllipseOfPoint_[i]);
                 }
@@ -267,6 +307,7 @@ namespace MyService
                 }
 
                 log.InfoFormat("Возвращено в вызывающий модуль {0} ячеек БМ с параметрами эллипсов", ellipses_.Count());
+                Console.WriteLine();
                 Console.WriteLine(String.Format("Возвращено в вызывающий модуль {0} ячеек БМ с параметрами эллипсов", ellipses_.Count()));
                 return ellipses_;
                 

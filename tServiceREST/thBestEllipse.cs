@@ -25,6 +25,8 @@ namespace tServiceREST
         private int             nElipsY_;
         private double          angleZ_;
         private int             nElipsZ_;
+        private Counter         counter_;
+        private int             increment_;
 
         public double              axisEllipseA { get; set; }
         public double              axisEllipseB { get; set; }
@@ -32,13 +34,15 @@ namespace tServiceREST
         public int                 minVariancePoints { get; set; }
 
 
-        public TheBestEllipseOfPoint(Point[] dhPoints, Point[] bmPoints, int xAxis, int yAxis, int zAxis, int nElpsX, int nElpsY, int nElpsZ)
+        public TheBestEllipseOfPoint(Point[] dhPoints, Point[] bmPoints, int xAxis, int yAxis, int zAxis, int nElpsX, int nElpsY, int nElpsZ,Counter counter)
         {
 
             axisEllipseA = xAxis;
             axisEllipseB = yAxis;
             axisEllipseC = zAxis;
             minVariancePoints = 4;
+            counter_ = counter;
+            increment_ = bmPoints.Count() / 6;
 
             theBestEllipses_ = new Ellipse[bmPoints.Count()];
 
@@ -158,11 +162,14 @@ namespace tServiceREST
             for (int i = 0; i < count; i++)
             {
                    theBestEllipses_[i] = computeTheBestEllipseForPoint(i);
-                   if (i % 50 == 0 || i == count-1)
+                   if (((i+1) % increment_ == 0))
                    {
-                       Console.WriteLine("Точка: "+ i.ToString()+" Найдено.");
-                       
+                       counter_.increaseCount(increment_);
+                       Console.SetCursorPosition(0,Console.CursorTop);
+                       Console.Write("Выполнение: "+ counter_.getPercent().ToString()+" %");
                    }
+                   
+
             }
 
         }
