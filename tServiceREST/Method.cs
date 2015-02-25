@@ -240,7 +240,6 @@ namespace MyService
             //BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "startCalculation/")]
             Ellipse[] startCalculation(DhBmObj data);
-
         }
 
          
@@ -255,7 +254,6 @@ namespace MyService
             private DhBmObj inData_;
             private Progress[] progress_;
 
-            
             public Ellipse[] startCalculation(DhBmObj data)
             {
 
