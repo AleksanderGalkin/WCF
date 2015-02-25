@@ -165,8 +165,13 @@ namespace tServiceREST
                    if (((i+1) % increment_ == 0))
                    {
                        counter_.increaseCount(increment_);
-                       Console.SetCursorPosition(0,Console.CursorTop);
-                       Console.Write("Выполнение: "+ counter_.getPercent().ToString()+" %");
+
+                       if (Environment.UserInteractive)
+                       {
+                           Console.SetCursorPosition(0, Console.CursorTop);
+                           Console.Write("Выполнение: " + counter_.getPercent().ToString() + " %");
+                       }
+
                    }
                    
 

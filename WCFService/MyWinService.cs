@@ -63,14 +63,22 @@ namespace WindowsService
 
         protected override void OnStart(string[] args)
         {
-            string URI = "http://localhost:8089/";
-            Type ServiceType=typeof(MyService.MyService);
-            Uri ServiceURI = new Uri(URI);
-            WebServiceHost host = new WebServiceHost(ServiceType, ServiceURI);
-           
-            host.Open();
-            log.Info("Запустили сервис");
-            logCon.Info("Запустили сервис");
+            try
+            {
+                string URI = "http://localhost:8089/";
+                Type ServiceType = typeof(MyService.MyService);
+                Uri ServiceURI = new Uri(URI);
+                WebServiceHost host = new WebServiceHost(ServiceType, ServiceURI);
+
+                host.Open();
+                log.Info("Запустили сервис");
+                logCon.Info("Запустили сервис");
+            }
+            catch (Exception ex)
+            {
+                log.FatalFormat("Что-то пошло не так и при этом получено исключение: {0}",ex.Message);
+                throw ex;
+            }
         }
 
         protected override void OnStop()

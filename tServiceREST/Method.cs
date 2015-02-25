@@ -263,7 +263,10 @@ namespace MyService
                 theBestEllipseOfPoint_ = new TheBestEllipseOfPoint[nTread_];
                 Thread[] threads=new Thread[nTread_];
                 Counter counter = new Counter(inData_.bm.points.Count());
-                Console.WriteLine("Количество параллельных потоков: " + nTread_ );
+                if (Environment.UserInteractive)
+                {
+                    Console.WriteLine("Количество параллельных потоков: " + nTread_);
+                }
                 for (int i = 0; i < nTread_; i++)
                 {
                     
@@ -305,18 +308,29 @@ namespace MyService
                 }
 
                 log.InfoFormat("Возвращено в вызывающий модуль {0} ячеек БМ с параметрами эллипсов", ellipses_.Count());
-                Console.WriteLine();
-                Console.WriteLine(String.Format("Возвращено в вызывающий модуль {0} ячеек БМ с параметрами эллипсов", ellipses_.Count()));
+                if (Environment.UserInteractive)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine(String.Format("Возвращено в вызывающий модуль {0} ячеек БМ с параметрами эллипсов", ellipses_.Count()));
+                }
                 return ellipses_;
                 
             }
 
             static void startThread(object obj)
             {
-                if (obj.GetType() != typeof(TheBestEllipseOfPoint))
-                    return;
-                TheBestEllipseOfPoint theBestEllipseOfPoint = obj as TheBestEllipseOfPoint;
-                theBestEllipseOfPoint.ComputeTheBestEllipses();
+                try
+                {
+                    if (obj.GetType() != typeof(TheBestEllipseOfPoint))
+                        return;
+                    TheBestEllipseOfPoint theBestEllipseOfPoint = obj as TheBestEllipseOfPoint;
+                    theBestEllipseOfPoint.ComputeTheBestEllipses();
+                }
+                catch (Exception ex)
+                {
+                    log.FatalFormat("Что-то пошло не так и при этом получено исключение: {0}", ex.Message);
+                }
+               
             }
 
         }
