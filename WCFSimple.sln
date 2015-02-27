@@ -1,14 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Web Developer Express 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tService", "tService\tService.csproj", "{4552E22A-F3D0-4618-88C7-342252EED1D5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{42B8CF56-3E41-4506-9895-108D50AD1E90}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{204CEC54-E5C3-4E78-8DA7-BAE41508495E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinService", "WinService\WinService.csproj", "{916F5C47-0730-40E1-9A35-92E3AFB4D929}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WFCService", "WCFService\WFCService.csproj", "{06BD8692-7D1D-4D44-AFEC-60BC817E9E6E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tServiceREST", "tServiceREST\tServiceREST.csproj", "{2F5C70A3-00CB-4F00-BC6B-F110F6C5F371}"
@@ -39,22 +31,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4552E22A-F3D0-4618-88C7-342252EED1D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4552E22A-F3D0-4618-88C7-342252EED1D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4552E22A-F3D0-4618-88C7-342252EED1D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4552E22A-F3D0-4618-88C7-342252EED1D5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{42B8CF56-3E41-4506-9895-108D50AD1E90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{42B8CF56-3E41-4506-9895-108D50AD1E90}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{42B8CF56-3E41-4506-9895-108D50AD1E90}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{42B8CF56-3E41-4506-9895-108D50AD1E90}.Release|Any CPU.Build.0 = Release|Any CPU
-		{204CEC54-E5C3-4E78-8DA7-BAE41508495E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{204CEC54-E5C3-4E78-8DA7-BAE41508495E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{204CEC54-E5C3-4E78-8DA7-BAE41508495E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{204CEC54-E5C3-4E78-8DA7-BAE41508495E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{916F5C47-0730-40E1-9A35-92E3AFB4D929}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{916F5C47-0730-40E1-9A35-92E3AFB4D929}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{916F5C47-0730-40E1-9A35-92E3AFB4D929}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{916F5C47-0730-40E1-9A35-92E3AFB4D929}.Release|Any CPU.Build.0 = Release|Any CPU
 		{06BD8692-7D1D-4D44-AFEC-60BC817E9E6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{06BD8692-7D1D-4D44-AFEC-60BC817E9E6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06BD8692-7D1D-4D44-AFEC-60BC817E9E6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
