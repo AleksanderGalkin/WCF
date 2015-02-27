@@ -12,6 +12,7 @@ using log4net.Config;
 
 namespace WindowsService
 {
+    
     public class WFCService : System.ServiceProcess.ServiceBase
     {
 

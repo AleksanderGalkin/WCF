@@ -10,12 +10,14 @@ using log4net;
 using log4net.Config;
 using System.Threading;
 using System.ComponentModel;
+using NUnit.Framework;
 
 
 
 namespace MyService    
 {
-   
+
+
     public class DhObj
     {
         [DataMember] public Point[] points { get; set; }
