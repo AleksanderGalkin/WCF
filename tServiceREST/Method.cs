@@ -15,69 +15,7 @@ using System.ComponentModel;
 
 namespace MyService    
 {
-    public class Point
-    {
-        public double x;
-        public double y;
-        public double z;
-        public double cr;
-        public string info;
-        public string priznak;
-
-        public Point (Point point)
-        {
-            this.cr = point.cr;
-            this.info = point.info;
-            this.x = point.x;
-            this.y = point.y;
-            this.z = point.z;
-        }
-        public Point()
-        {
-            cr = 0;
-            x = 0;
-            y = 0;
-            z = 0;
-        }
-    }
-
-    public class Counter
-    {
-        private int count_;
-        private int totalAllThreats_;
-        private object locker = new object();
-
-
-        public Counter(int totalAllThreats)
-        {
-            totalAllThreats_ = totalAllThreats;
-            count_ = 0;
-        }
-        public int getCount()
-        {
-            return count_;
-        }
-        public int getPercent()
-        {
-            return (int)(100.0/totalAllThreats_*count_);
-        }
-        public void setCount(int count)
-        {
-            lock (locker)
-            {
-                count_ = count;
-            }
-        }
-        public void increaseCount(int count)
-        {
-            lock (locker)
-            {
-                count_ += count;
-            }
-        }
-    }
-
-    [DataContract]
+   
     public class DhObj
     {
         [DataMember] public Point[] points { get; set; }
@@ -86,7 +24,7 @@ namespace MyService
         [DataMember] public int zElPos { get; set; }
  
     };
-    [DataContract]
+
     public class BmObj
     {
         [DataMember] public Point[] points { get; set; }
@@ -129,16 +67,7 @@ namespace MyService
         [DataMember]
         public BmObj bm { get; set; }
     }
-    [DataContract]
-    public class Progress
-    {
-        [DataMember]
-        public double percent { get; set; }
-        public Progress(int parPercent)
-        {
-            percent = parPercent;
-        }
-    }
+
     [DataContract]
     public class Ellipse
     {
@@ -230,8 +159,8 @@ namespace MyService
     };
 
 
-        [ServiceContract]
-        public interface IMyService
+    [ServiceContract]
+    public interface IMyService
         {
             [OperationContract]
             [WebInvoke(Method = "POST",   
@@ -243,23 +172,21 @@ namespace MyService
         }
 
          
-        public class MyService : IMyService
+    public class MyService : IMyService
         {
             
             public static readonly ILog log = LogManager.GetLogger(typeof(MyService));
             public static readonly ILog logCon = LogManager.GetLogger("ConsoleAppender");
-            private int nTread_ = 4;
+            private int nTread_ = 6;
             private Ellipse[] ellipses_;
             private TheBestEllipseOfPoint[] theBestEllipseOfPoint_;
             private DhBmObj inData_;
-            private Progress[] progress_;
 
             public Ellipse[] startCalculation(DhBmObj data)
             {
 
                 inData_ = data;
                 BmObj[] bmObjs = new BmObj[nTread_];
-                progress_ = new Progress[nTread_];
                 theBestEllipseOfPoint_ = new TheBestEllipseOfPoint[nTread_];
                 Thread[] threads=new Thread[nTread_];
                 Counter counter = new Counter(inData_.bm.points.Count());

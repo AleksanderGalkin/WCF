@@ -54,9 +54,9 @@ namespace WindowsService
             //
             // serviceInstaller1
             //
-            this.serviceInstaller1.Description = "WCF сервис через Windows Service";
-            this.serviceInstaller1.DisplayName = "WCFService";
-            this.serviceInstaller1.ServiceName = "WCFService";
+            this.serviceInstaller1.Description = "Rotation ellipses to optimum 3D position for interpolation";
+            this.serviceInstaller1.DisplayName = "EllipsesRotationServce";
+            this.serviceInstaller1.ServiceName = "EllipsesRotationServce";
             this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             //
             // ProjectInstaller

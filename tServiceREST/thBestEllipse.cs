@@ -14,6 +14,11 @@ namespace tServiceREST
     {
         public int idxThreat { get; set; }
         public static readonly ILog log = LogManager.GetLogger(typeof(Ellipse));
+        public double axisEllipseA { get; set; }
+        public double axisEllipseB { get; set; }
+        public double axisEllipseC { get; set; }
+        public int minVariancePoints { get; set; }
+
         private Point[]         dhPoints_;
         private Point[]         bmPoints_;
         private Point[][][][]   rotatedPointsOfDhPoints_;
@@ -28,13 +33,18 @@ namespace tServiceREST
         private Counter         counter_;
         private int             increment_;
 
-        public double              axisEllipseA { get; set; }
-        public double              axisEllipseB { get; set; }
-        public double              axisEllipseC { get; set; }
-        public int                 minVariancePoints { get; set; }
 
 
-        public TheBestEllipseOfPoint(Point[] dhPoints, Point[] bmPoints, int xAxis, int yAxis, int zAxis, int nElpsX, int nElpsY, int nElpsZ,Counter counter)
+
+        public TheBestEllipseOfPoint(Point[] dhPoints
+                                    , Point[] bmPoints
+                                    , int xAxis
+                                    , int yAxis
+                                    , int zAxis
+                                    , int nElpsX
+                                    , int nElpsY
+                                    , int nElpsZ
+                                    ,Counter counter)
         {
 
             axisEllipseA = xAxis;
@@ -58,20 +68,20 @@ namespace tServiceREST
 
             log.Debug("Формирование массива повернутых скважин");
 
-            rotatedPointsOfDhPoints_ = new Point[dhPoints_.Count()][][][];  //массив поворотов точек скважин
+            rotatedPointsOfDhPoints_ = new Point [dhPoints_.Count()][][][];  //массив поворотов точек скважин
             for (int i = 0; i < rotatedPointsOfDhPoints_.Count();i++ )
             {
-                rotatedPointsOfDhPoints_[i] = new Point[nElipsX_][][]; // для каждой точки массив поворотов вокруг оси X 
+                rotatedPointsOfDhPoints_[i] = new Point [nElipsX_][][]; // для каждой точки массив поворотов вокруг оси X 
 
                 for (int ix = 0; ix < nElipsX_; ix++ )
                 {
-                    rotatedPointsOfDhPoints_[i][ix] = new Point[nElipsY_][]; // для каждго поворота вокруг оси X создаём массив поворотов вокруг оси Y
+                    rotatedPointsOfDhPoints_[i][ix] = new Point [nElipsY_][]; // для каждго поворота вокруг оси X создаём массив поворотов вокруг оси Y
                     for (int iy = 0; iy < nElipsY_; iy++ )
                     {
-                        rotatedPointsOfDhPoints_[i][ix][iy] = new Point[nElipsZ_]; // для каждго поворота вокруг оси Y создаём массив поворотов вокруг оси Z
+                        rotatedPointsOfDhPoints_[i][ix][iy] = new Point [nElipsZ_]; // для каждго поворота вокруг оси Y создаём массив поворотов вокруг оси Z
                          for (int iz = 0; iz < nElipsZ_; iz++ )
                          {
-                             rotatedPointsOfDhPoints_[i][ix][iy][iz] = getRotatedPoint(   dhPoints[i],
+                             rotatedPointsOfDhPoints_ [i][ix][iy][iz] = getRotatedPoint(   dhPoints[i],
                                                                                         angleX_ * ix,
                                                                                         angleY_ * iy,
                                                                                         angleZ_ * iz
@@ -80,11 +90,11 @@ namespace tServiceREST
                     }
                 }
             }
-            log.Debug("Формирование массива повернутых ячеек блочной модели");
+            log.Debug ("Формирование массива повернутых ячеек блочной модели");
             rotatedPointsOfBmPoints_ = new Point[bmPoints_.Count()][][][];  //массив поворотов точек скважин
             for (int i = 0; i < rotatedPointsOfBmPoints_.Count(); i++)
             {
-                rotatedPointsOfBmPoints_[i] = new Point[nElipsX_][][]; // для каждой точки массив поворотов вокруг оси X 
+                rotatedPointsOfBmPoints_[i] = new Point [nElipsX_][][]; // для каждой точки массив поворотов вокруг оси X 
 
                 for (int ix = 0; ix < nElipsX_; ix++)
                 {
@@ -162,7 +172,9 @@ namespace tServiceREST
             for (int i = 0; i < count; i++)
             {
                    theBestEllipses_[i] = computeTheBestEllipseForPoint(i);
-                   if (((i+1) % increment_ == 0))
+
+                   // Informing user about execution progress 
+                   if (((i+1) % increment_ == 0)) 
                    {
                        counter_.increaseCount(increment_);
 
@@ -190,7 +202,8 @@ namespace tServiceREST
             int noRotationX = 0;
             int noRotationY = 0;
             int noRotationZ = 0;
-            for (double multAxises = 1; multAxises < 1.6 && theBestCriterion==99999; multAxises = multAxises + 0.2)
+
+            for (double multAxises = 1; multAxises < 1.6 && theBestCriterion == 99999; multAxises = multAxises + 0.2)
             {
                 for (int ix = 0; ix < rtdPntsSet.Count(); ix++)
                 {
@@ -245,8 +258,6 @@ namespace tServiceREST
 
         double getTrueDipDirection(double radX, double radY,double radZ)
         {
-
-
             Point reversedXVektor = getReverseRotatedPoint(getXVector(), radX, radY, radZ);
             Point azimuth = getAzimuth();
             Point XYProjectionOfReversedXVektor = getXYProjection(reversedXVektor, azimuth);
@@ -347,5 +358,64 @@ namespace tServiceREST
 
     }
 
-    
+    public class Counter
+    {
+        private int count_;
+        private int totalAllThreats_;
+        private object locker = new object();
+
+
+        public Counter(int totalAllThreats)
+        {
+            totalAllThreats_ = totalAllThreats;
+            count_ = 0;
+        }
+        public int getCount()
+        {
+            return count_;
+        }
+        public int getPercent()
+        {
+            return (int)(100.0 / totalAllThreats_ * count_);
+        }
+        public void setCount(int count)
+        {
+            lock (locker)
+            {
+                count_ = count;
+            }
+        }
+        public void increaseCount(int count)
+        {
+            lock (locker)
+            {
+                count_ += count;
+            }
+        }
+    }
+    public class Point
+    {
+        public double x;
+        public double y;
+        public double z;
+        public double cr;
+        public string info;
+        public string priznak;
+
+        public Point(Point point)
+        {
+            this.cr = point.cr;
+            this.info = point.info;
+            this.x = point.x;
+            this.y = point.y;
+            this.z = point.z;
+        }
+        public Point()
+        {
+            cr = 0;
+            x = 0;
+            y = 0;
+            z = 0;
+        }
+    }
 }

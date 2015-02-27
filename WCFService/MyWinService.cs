@@ -22,7 +22,7 @@ namespace WindowsService
         private ProjectInstaller projectInstaller2;
         public WFCService()
         {
-            this.ServiceName = "MyWFCService";
+            this.ServiceName = "EllipsesRotationServce";
             this.CanStop = true;
             this.CanPauseAndContinue = true;
             this.AutoLog = true;
@@ -44,7 +44,6 @@ namespace WindowsService
                 service.OnStart(args);
                 Console.WriteLine("Press Enter key to stop program");
                 Console.Read();
-                
                 service.OnStop();
             }
             else
@@ -63,28 +62,18 @@ namespace WindowsService
 
         protected override void OnStart(string[] args)
         {
-            try
-            {
-                string URI = "http://localhost:8089/";
-                Type ServiceType = typeof(MyService.MyService);
-                Uri ServiceURI = new Uri(URI);
-                WebServiceHost host = new WebServiceHost(ServiceType, ServiceURI);
 
+                Type ServiceType = typeof(MyService.MyService);
+                WebServiceHost host = new WebServiceHost(ServiceType);
                 host.Open();
                 log.Info("Запустили сервис");
                 logCon.Info("Запустили сервис");
-            }
-            catch (Exception ex)
-            {
-                log.FatalFormat("Что-то пошло не так и при этом получено исключение: {0}",ex.Message);
-                throw ex;
-            }
         }
 
         protected override void OnStop()
         {
-            log.Info("Останавливаем сервис");
-            logCon.Info("Останавливаем сервис");
+                log.Info("Останавливаем сервис");
+                logCon.Info("Останавливаем сервис");
         }
     }
 }
