@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="thBestEllipseTst.cs" />
     <Compile Include="Method.cs" />
     <Compile Include="MethodTst.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

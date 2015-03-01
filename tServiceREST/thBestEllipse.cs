@@ -81,11 +81,11 @@ namespace tServiceREST
                         rotatedPointsOfDhPoints_[i][ix][iy] = new Point [nElipsZ_]; // для каждго поворота вокруг оси Y создаём массив поворотов вокруг оси Z
                          for (int iz = 0; iz < nElipsZ_; iz++ )
                          {
-                             rotatedPointsOfDhPoints_ [i][ix][iy][iz] = getRotatedPoint(   dhPoints[i],
-                                                                                        angleX_ * ix,
-                                                                                        angleY_ * iy,
-                                                                                        angleZ_ * iz
-                                                                                    );
+                             rotatedPointsOfDhPoints_ [i][ix][iy][iz] = dhPoints[i].getRotatedPoint(   
+                                                                                                    angleX_ * ix,
+                                                                                                    angleY_ * iy,
+                                                                                                    angleZ_ * iz
+                                                                                                );
                          }
                     }
                 }
@@ -104,7 +104,7 @@ namespace tServiceREST
                         rotatedPointsOfBmPoints_[i][ix][iy] = new Point[nElipsZ_]; // для каждго поворота вокруг оси Y создаём массив поворотов вокруг оси Z
                         for (int iz = 0; iz < nElipsZ_; iz++)
                         {
-                            rotatedPointsOfBmPoints_[i][ix][iy][iz] = getRotatedPoint(bmPoints[i],
+                            rotatedPointsOfBmPoints_[i][ix][iy][iz] = bmPoints[i].getRotatedPoint(
                                                                                        angleX_ * ix,
                                                                                        angleY_ * iy,
                                                                                        angleZ_ * iz
@@ -116,55 +116,6 @@ namespace tServiceREST
 
 
         }
-        private Point getRotatedPoint(Point pPnt, double radX, double radY, double radZ)
-        {
-            Point bufferPoint = new Point(pPnt);
-            Point resultPoint = new Point();
-            resultPoint.cr = bufferPoint.cr;
-            resultPoint.info = bufferPoint.info;
-
-            resultPoint.x = bufferPoint.x;
-            resultPoint.y = bufferPoint.y * Math.Cos(radX) + bufferPoint.z * Math.Sin(radX);
-            resultPoint.z = -bufferPoint.y * Math.Sin(radX) + bufferPoint.z * Math.Cos(radX);
-            bufferPoint.x = resultPoint.x; bufferPoint.y = resultPoint.y; bufferPoint.z = resultPoint.z;
-
-            resultPoint.y = bufferPoint.y;
-            resultPoint.z = bufferPoint.z * Math.Cos(radY) + bufferPoint.x * Math.Sin(radY);
-            resultPoint.x = -bufferPoint.z * Math.Sin(radY) + bufferPoint.x * Math.Cos(radY);
-            bufferPoint.x = resultPoint.x; bufferPoint.y = resultPoint.y; bufferPoint.z = resultPoint.z;
-
-            resultPoint.z = bufferPoint.z;
-            resultPoint.x = bufferPoint.x * Math.Cos(radZ) + bufferPoint.y * Math.Sin(radZ);
-            resultPoint.y = -bufferPoint.x * Math.Sin(radZ) + bufferPoint.y * Math.Cos(radZ);
-
-            return resultPoint;
-        }
-
-
-        private Point getReverseRotatedPoint(Point pPnt, double radX, double radY, double radZ)
-        {
-            Point bufferPoint = new Point(pPnt);
-            Point resultPoint = new Point();
-            resultPoint.cr = bufferPoint.cr;
-            resultPoint.info = bufferPoint.info;
-
-            resultPoint.z = bufferPoint.z;
-            resultPoint.x = bufferPoint.x * Math.Cos(radZ) - bufferPoint.y * Math.Sin(radZ);
-            resultPoint.y = bufferPoint.x * Math.Sin(radZ) + bufferPoint.y * Math.Cos(radZ);
-            bufferPoint.x = resultPoint.x; bufferPoint.y = resultPoint.y; bufferPoint.z = resultPoint.z;
-
-            resultPoint.y = bufferPoint.y;
-            resultPoint.z = bufferPoint.z * Math.Cos(radY) - bufferPoint.x * Math.Sin(radY);
-            resultPoint.x = bufferPoint.z * Math.Sin(radY) + bufferPoint.x * Math.Cos(radY);
-            bufferPoint.x = resultPoint.x; bufferPoint.y = resultPoint.y; bufferPoint.z = resultPoint.z;
-
-            resultPoint.x = bufferPoint.x;
-            resultPoint.y = bufferPoint.y * Math.Cos(radX) - bufferPoint.z * Math.Sin(radX);
-            resultPoint.z = bufferPoint.y * Math.Sin(radX) + bufferPoint.z * Math.Cos(radX);
-            
-
-            return resultPoint;
-        }
 
         public void ComputeTheBestEllipses()
         {
@@ -174,13 +125,26 @@ namespace tServiceREST
                    theBestEllipses_[i] = computeTheBestEllipseForPoint(i);
 
                    // Informing user about execution progress 
-                   if (((i+1) % increment_ == 0)) 
+                   if (((i + 1) % increment_ == 0) || (i + 1) == count) 
                    {
-                       counter_.increaseCount(increment_);
-
+                       if ((i + 1) == count)
+                       {
+                           counter_.increaseCount(count % increment_);
+                       }
+                       else
+                       {
+                           counter_.increaseCount(increment_);
+                       }
                        if (Environment.UserInteractive)
                        {
-                           Console.SetCursorPosition(0, Console.CursorTop);
+                           try
+                           {
+                               Console.SetCursorPosition(0, Console.CursorTop);
+                           }
+                           catch
+                           {
+                               Console.WriteLine();
+                           }
                            Console.Write("Выполнение: " + counter_.getPercent().ToString() + " %");
                        }
 
@@ -202,8 +166,9 @@ namespace tServiceREST
             int noRotationX = 0;
             int noRotationY = 0;
             int noRotationZ = 0;
-
-            for (double multAxises = 1; multAxises < 1.6 && theBestCriterion == 99999; multAxises = multAxises + 0.2)
+            double LIMIT_OF_ELLIPSE_EXPAND = 1.6;
+            double STEP_OF_ELLIPSE_EXPAND = 0.2;
+            for (double multAxises = 1; multAxises < LIMIT_OF_ELLIPSE_EXPAND && theBestCriterion == 99999; multAxises = multAxises + STEP_OF_ELLIPSE_EXPAND)
             {
                 for (int ix = 0; ix < rtdPntsSet.Count(); ix++)
                 {
@@ -258,13 +223,13 @@ namespace tServiceREST
 
         double getTrueDipDirection(double radX, double radY,double radZ)
         {
-            Point reversedXVektor = getReverseRotatedPoint(getXVector(), radX, radY, radZ);
+            Point reversedXVektor = getXVector().getReverseRotatedPoint(radX, radY, radZ);
             Point azimuth = getAzimuth();
             Point XYProjectionOfReversedXVektor = getXYProjection(reversedXVektor, azimuth);
 
             if (isNullVector(XYProjectionOfReversedXVektor))
             {
-                XYProjectionOfReversedXVektor.z = 10;
+                XYProjectionOfReversedXVektor.y = 10;
             }
 
             double pseudoScalarProduct = XYProjectionOfReversedXVektor.x * azimuth.y - azimuth.x * XYProjectionOfReversedXVektor.y;
@@ -283,7 +248,7 @@ namespace tServiceREST
 
         double getTrueDip( double radX, double radY, double radZ)
         {
-            Point reversedXVektor = getReverseRotatedPoint(getXVector(), radX, radY, radZ);
+            Point reversedXVektor = getXVector().getReverseRotatedPoint( radX, radY, radZ);
             Point azimuth = getAzimuth();
             Point ZYProjectionOfReversedXVektor = getZYProjection(reversedXVektor, azimuth);
 
@@ -360,7 +325,7 @@ namespace tServiceREST
 
     public class Counter
     {
-        private int count_;
+        private double count_;
         private int totalAllThreats_;
         private object locker = new object();
 
@@ -372,20 +337,27 @@ namespace tServiceREST
         }
         public int getCount()
         {
-            return count_;
+            return (int) Math.Round(count_,0);
         }
         public int getPercent()
         {
-            return (int)(100.0 / totalAllThreats_ * count_);
+            if (getCount() > totalAllThreats_)
+            {
+                return 100;
+            }
+            else
+            {
+                return (int)(100.0 / totalAllThreats_ * getCount());
+            }
         }
-        public void setCount(int count)
+        public void setCount(double count)
         {
             lock (locker)
             {
                 count_ = count;
             }
         }
-        public void increaseCount(int count)
+        public void increaseCount(double count)
         {
             lock (locker)
             {
@@ -393,6 +365,7 @@ namespace tServiceREST
             }
         }
     }
+
     public class Point
     {
         public double x;
@@ -416,6 +389,62 @@ namespace tServiceREST
             x = 0;
             y = 0;
             z = 0;
+        }
+
+        public Point getRotatedPoint(double radX, double radY, double radZ)
+        {
+            Point bufferPoint = new Point(this);
+            Point resultPoint = new Point();
+            resultPoint.cr = bufferPoint.cr;
+            resultPoint.info = bufferPoint.info;
+
+            resultPoint.x = bufferPoint.x;
+            resultPoint.y = bufferPoint.y * Math.Cos(radX) + bufferPoint.z * Math.Sin(radX);
+            resultPoint.z = -bufferPoint.y * Math.Sin(radX) + bufferPoint.z * Math.Cos(radX);
+            bufferPoint.x = resultPoint.x; bufferPoint.y = resultPoint.y; bufferPoint.z = resultPoint.z;
+
+            resultPoint.y = bufferPoint.y;
+            resultPoint.z = bufferPoint.z * Math.Cos(radY) + bufferPoint.x * Math.Sin(radY);
+            resultPoint.x = -bufferPoint.z * Math.Sin(radY) + bufferPoint.x * Math.Cos(radY);
+            bufferPoint.x = resultPoint.x; bufferPoint.y = resultPoint.y; bufferPoint.z = resultPoint.z;
+
+            resultPoint.z = bufferPoint.z;
+            resultPoint.x = bufferPoint.x * Math.Cos(radZ) + bufferPoint.y * Math.Sin(radZ);
+            resultPoint.y = -bufferPoint.x * Math.Sin(radZ) + bufferPoint.y * Math.Cos(radZ);
+
+            resultPoint.x = Math.Round(resultPoint.x, 6);
+            resultPoint.y = Math.Round(resultPoint.y, 6);
+            resultPoint.z = Math.Round(resultPoint.z, 6);
+
+            return resultPoint;
+        }
+
+        public Point getReverseRotatedPoint(double radX, double radY, double radZ)
+        {
+            Point bufferPoint = new Point(this);
+            Point resultPoint = new Point();
+            resultPoint.cr = bufferPoint.cr;
+            resultPoint.info = bufferPoint.info;
+
+            resultPoint.z = bufferPoint.z;
+            resultPoint.x = bufferPoint.x * Math.Cos(radZ) - bufferPoint.y * Math.Sin(radZ);
+            resultPoint.y = bufferPoint.x * Math.Sin(radZ) + bufferPoint.y * Math.Cos(radZ);
+            bufferPoint.x = resultPoint.x; bufferPoint.y = resultPoint.y; bufferPoint.z = resultPoint.z;
+
+            resultPoint.y = bufferPoint.y;
+            resultPoint.z = bufferPoint.z * Math.Cos(radY) - bufferPoint.x * Math.Sin(radY);
+            resultPoint.x = bufferPoint.z * Math.Sin(radY) + bufferPoint.x * Math.Cos(radY);
+            bufferPoint.x = resultPoint.x; bufferPoint.y = resultPoint.y; bufferPoint.z = resultPoint.z;
+
+            resultPoint.x = bufferPoint.x;
+            resultPoint.y = bufferPoint.y * Math.Cos(radX) - bufferPoint.z * Math.Sin(radX);
+            resultPoint.z = bufferPoint.y * Math.Sin(radX) + bufferPoint.z * Math.Cos(radX);
+
+            resultPoint.x = Math.Round(resultPoint.x, 6);
+            resultPoint.y = Math.Round(resultPoint.y, 6);
+            resultPoint.z = Math.Round(resultPoint.z, 6);
+
+            return resultPoint;
         }
     }
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VisualState xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ShowCheckBoxes="false">
+  <TopNode>[0-1000]E:\GIT\AleksanderGalkin\WCF\tServiceREST\tServiceREST.csproj</TopNode>
+  <SelectedNode>[0-1010]Tests.TestCounter.trueCounterWork</SelectedNode>
+  <ExcludeCategories>false</ExcludeCategories>
+  <Nodes>
+    <Node UniqueName="[0-1000]E:\GIT\AleksanderGalkin\WCF\tServiceREST\tServiceREST.csproj" Expanded="true" />
+    <Node UniqueName="[0-1011]E:\GIT\AleksanderGalkin\WCF\tServiceREST\bin\Debug\tServiceREST.dll" Expanded="true" />
+    <Node UniqueName="[0-1012]Tests" Expanded="true" />
+    <Node UniqueName="[0-1003]Tests.TestBmObj" Expanded="true" />
+    <Node UniqueName="[0-1009]Tests.TestCounter" Expanded="true" />
+    <Node UniqueName="[0-1001]Tests.TestMyService" Expanded="true" />
+    <Node UniqueName="[0-1007]Tests.TestPoint" Expanded="true" />
+    <Node UniqueName="[0-1005]Tests.TestTheBestEllipseOfPoint" Expanded="true" />
+  </Nodes>
+</VisualState>

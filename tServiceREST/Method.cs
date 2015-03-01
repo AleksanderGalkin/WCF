@@ -18,12 +18,15 @@ namespace MyService
 {
 
 
+ 
+
+
     public class DhObj
     {
         [DataMember] public Point[] points { get; set; }
-        [DataMember] public int xElPos { get; set; }
-        [DataMember] public int yElPos { get; set; }
-        [DataMember] public int zElPos { get; set; }
+         public int xElPos { get; set; }
+         public int yElPos { get; set; }
+         public int zElPos { get; set; }
  
     };
 
@@ -37,6 +40,28 @@ namespace MyService
         [DataMember] public int yElPos { get; set; }
         [DataMember] public int zElPos { get; set; }
         public BmObj() { }
+        //public BmObj(BmObj bmObj, int nParts, int numOfPart)
+        //{
+        //    this.xAxis = bmObj.xAxis;
+        //    this.yAxis = bmObj.yAxis;
+        //    this.zAxis = bmObj.zAxis;
+        //    this.xElPos = bmObj.xElPos;
+        //    this.yElPos = bmObj.yElPos;
+        //    this.zElPos = bmObj.zElPos;
+        //    int itemFrom = (numOfPart - 1) * bmObj.points.Count() / nParts;
+        //    int itemTo = numOfPart != nParts ?
+        //                                        numOfPart * bmObj.points.Count() / nParts
+        //                                     :
+        //                                        bmObj.points.Count()-1;
+
+        //    points = new Point[itemTo-itemFrom];
+        //    int k = 0;
+        //    for (int i = itemFrom; i <= itemTo; i++)
+        //    {
+        //        this.points[k++] = new Point(bmObj.points[i]);
+        //    }
+        //}
+
         public BmObj(BmObj bmObj, int nParts, int numOfPart)
         {
             this.xAxis = bmObj.xAxis;
@@ -45,13 +70,24 @@ namespace MyService
             this.xElPos = bmObj.xElPos;
             this.yElPos = bmObj.yElPos;
             this.zElPos = bmObj.zElPos;
-            int itemFrom = (numOfPart - 1) * bmObj.points.Count() / nParts;
+            int countOfPointInPart = (int) Math.Floor((double)(bmObj.points.Count() / nParts));
+            int countOfExtendentPoints = bmObj.points.Count() % nParts;
+            int countPointBefore;
+            if (numOfPart <= countOfExtendentPoints)
+            {
+                countPointBefore = (numOfPart - 1) * (countOfPointInPart + 1);
+            }
+            else
+            {
+                countPointBefore = countOfExtendentPoints + ((numOfPart - 1) * countOfPointInPart);
+            }
+            int itemFrom = countPointBefore ;
             int itemTo = numOfPart != nParts ?
-                                                numOfPart * bmObj.points.Count() / nParts
+                                                countPointBefore + (numOfPart <= countOfExtendentPoints ?  countOfPointInPart + 1
+                                                                                                        :  countOfPointInPart)
                                              :
                                                 bmObj.points.Count();
-
-            points = new Point[itemTo-itemFrom];
+            points = new Point[itemTo - itemFrom];
             int k = 0;
             for (int i = itemFrom; i < itemTo; i++)
             {
@@ -242,6 +278,15 @@ namespace MyService
                     Console.WriteLine();
                     Console.WriteLine(String.Format("Возвращено в вызывающий модуль {0} ячеек БМ с параметрами эллипсов", ellipses_.Count()));
                 }
+
+                double[] dd = new double[ellipses_.Count()];
+                double[] d = new double[ellipses_.Count()];
+                for (int i = 0; i < ellipses_.Count(); i++)
+                {
+                    dd[i] = ellipses_[i].trDipDir;
+                    d[i] = ellipses_[i].trDip;
+                }
+
                 return ellipses_;
                 
             }
