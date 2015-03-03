@@ -250,17 +250,22 @@ namespace tServiceREST
         {
             Point reversedXVektor = getXVector().getReverseRotatedPoint( radX, radY, radZ);
             Point azimuth = getAzimuth();
-            Point ZYProjectionOfReversedXVektor = getZYProjection(reversedXVektor, azimuth);
+            Point XYProjectionOfReversedXVektor = getXYProjection(reversedXVektor, azimuth);
 
-            if (isNullVector(ZYProjectionOfReversedXVektor))
+            if (isNullVector(XYProjectionOfReversedXVektor))
             {
-                ZYProjectionOfReversedXVektor.y = 10;
+                XYProjectionOfReversedXVektor.y = 10;
             }
 
-            double pseudoScalarProduct = ZYProjectionOfReversedXVektor.y * azimuth.z - azimuth.y * ZYProjectionOfReversedXVektor.z;
-            double scalarVektor1 = Math.Sqrt(Math.Pow(azimuth.y, 2) + Math.Pow(azimuth.z, 2) );
-            double scalarVektor2 = Math.Sqrt(Math.Pow(ZYProjectionOfReversedXVektor.y, 2) + Math.Pow(ZYProjectionOfReversedXVektor.z, 2));
-            double radAngleAz = Math.Asin(pseudoScalarProduct / (scalarVektor1 * scalarVektor2));
+            double pseudoScalarX = reversedXVektor.y * XYProjectionOfReversedXVektor.z -  reversedXVektor.z * XYProjectionOfReversedXVektor.y;
+            double pseudoScalarY = reversedXVektor.z * XYProjectionOfReversedXVektor.x - reversedXVektor.x * XYProjectionOfReversedXVektor.z;
+            double pseudoScalarZ = reversedXVektor.x * XYProjectionOfReversedXVektor.y - reversedXVektor.y * XYProjectionOfReversedXVektor.x;
+
+            double pseudoScalar0 = Math.Sqrt(Math.Pow(pseudoScalarX, 2) + Math.Pow(pseudoScalarY, 2) + Math.Pow(pseudoScalarZ, 2)); ;
+            double scalarVektor1 = Math.Sqrt(Math.Pow(XYProjectionOfReversedXVektor.x, 2) + Math.Pow(XYProjectionOfReversedXVektor.y, 2) + Math.Pow(XYProjectionOfReversedXVektor.z, 2));
+            double scalarVektor2 = Math.Sqrt(Math.Pow(reversedXVektor.x, 2) + Math.Pow(reversedXVektor.y, 2) + Math.Pow(reversedXVektor.z, 2));
+
+            double radAngleAz = Math.Asin(pseudoScalar0 / (scalarVektor1 * scalarVektor2));
             double degreeAngleAz = radAngleAz * 180 / Math.PI;
             if (degreeAngleAz < 0)
             {

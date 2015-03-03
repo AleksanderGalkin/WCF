@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!--This file represents the results of running a test suite-->
-<test-results name="E:\GIT\AleksanderGalkin\WCF\tServiceREST\tServiceREST.csproj" total="6" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2015-03-01" time="18:06:55">
+<test-results name="E:\GIT\AleksanderGalkin\WCF\tServiceREST\tServiceREST.csproj" total="6" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2015-03-02" time="08:30:49">
   <environment nunit-version="2.6.3.13283" clr-version="2.0.50727.5420" os-version="Microsoft Windows NT 6.1.7601 Service Pack 1" platform="Win32NT" cwd="E:\GIT\AleksanderGalkin\WCF\tServiceREST" machine-name="OGK-WD-128" user="GalkinAP" user-domain="MOS" />
   <culture-info current-culture="ru-RU" current-uiculture="ru-RU" />
-  <test-suite type="Project" name="E:\GIT\AleksanderGalkin\WCF\tServiceREST\tServiceREST.csproj" executed="True" result="Success" success="True" time="0.060" asserts="0">
+  <test-suite type="Project" name="E:\GIT\AleksanderGalkin\WCF\tServiceREST\tServiceREST.csproj" executed="True" result="Success" success="True" time="0.239" asserts="0">
     <results>
-      <test-suite type="Assembly" name="E:\GIT\AleksanderGalkin\WCF\tServiceREST\bin\Debug\tServiceREST.dll" executed="True" result="Success" success="True" time="0.060" asserts="0">
+      <test-suite type="Assembly" name="E:\GIT\AleksanderGalkin\WCF\tServiceREST\bin\Debug\tServiceREST.dll" executed="True" result="Success" success="True" time="0.238" asserts="0">
         <results>
-          <test-suite type="Namespace" name="Tests" executed="True" result="Success" success="True" time="0.059" asserts="0">
+          <test-suite type="Namespace" name="Tests" executed="True" result="Success" success="True" time="0.238" asserts="0">
             <results>
-              <test-suite type="TestFixture" name="TestBmObj" executed="True" result="Success" success="True" time="0.001" asserts="0">
+              <test-suite type="TestFixture" name="TestBmObj" executed="True" result="Success" success="True" time="0.040" asserts="0">
                 <results>
-                  <test-case name="Tests.TestBmObj.truePartionOfPoints" executed="True" result="Success" success="True" time="0.000" asserts="4" />
+                  <test-case name="Tests.TestBmObj.truePartionOfPoints" executed="True" result="Success" success="True" time="0.014" asserts="4" />
                 </results>
               </test-suite>
               <test-suite type="TestFixture" name="TestCounter" executed="True" result="Success" success="True" time="0.001" asserts="0">
@@ -24,9 +24,9 @@
                   <test-case name="Tests.TestEllipse.trueVarianceCalculationOfEllipse" executed="True" result="Success" success="True" time="0.000" asserts="1" />
                 </results>
               </test-suite>
-              <test-suite type="TestFixture" name="TestMyService" executed="True" result="Success" success="True" time="0.002" asserts="0">
+              <test-suite type="TestFixture" name="TestMyService" executed="True" result="Success" success="True" time="0.071" asserts="0">
                 <results>
-                  <test-case name="Tests.TestMyService.returnedEllipsesCountEqualBmCellsCount" executed="True" result="Success" success="True" time="0.002" asserts="1" />
+                  <test-case name="Tests.TestMyService.returnedEllipsesCountEqualBmCellsCount" executed="True" result="Success" success="True" time="0.071" asserts="1" />
                 </results>
               </test-suite>
               <test-suite type="TestFixture" name="TestPoint" executed="True" result="Success" success="True" time="0.001" asserts="0">
@@ -34,9 +34,9 @@
                   <test-case name="Tests.TestPoint.trueRotateAndReverseRotateOfPoint" executed="True" result="Success" success="True" time="0.000" asserts="9" />
                 </results>
               </test-suite>
-              <test-suite type="TestFixture" name="TestTheBestEllipseOfPoint" executed="True" result="Success" success="True" time="0.007" asserts="0">
+              <test-suite type="TestFixture" name="TestTheBestEllipseOfPoint" executed="True" result="Success" success="True" time="0.046" asserts="0">
                 <results>
-                  <test-case name="Tests.TestTheBestEllipseOfPoint.returnedEllipsesCountEqualBmCellsCount" executed="True" result="Success" success="True" time="0.006" asserts="8" />
+                  <test-case name="Tests.TestTheBestEllipseOfPoint.returnedEllipsesCountEqualBmCellsCount" executed="True" result="Success" success="True" time="0.046" asserts="8" />
                 </results>
               </test-suite>
             </results>
