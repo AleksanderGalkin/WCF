@@ -163,6 +163,7 @@ namespace tServiceREST
             Ellipse eRes = new Ellipse(bmPoints_[pIndex], axisEllipseA, axisEllipseB, axisEllipseC);
             double? curCriterrion = 99999;
             double? theBestCriterion = 99999;
+            double? theBestAverage = 99999;
             int noRotationX = 0;
             int noRotationY = 0;
             int noRotationZ = 0;
@@ -195,6 +196,7 @@ namespace tServiceREST
                             if (isCurCriterionIsTheBest && isCurCriterionNumPointsMoreMinVPoints)
                             {
                                 theBestCriterion = curCriterrion;
+                                theBestAverage = e.average;
                                 noRotationX = ix;
                                 noRotationY = iy;
                                 noRotationZ = iz;
@@ -205,6 +207,8 @@ namespace tServiceREST
                 }
             }
            log.DebugFormat(" Лучший поворот эллипса {0}-{1}-{2},  критерий оценки {3}", noRotationX, noRotationY, noRotationZ, theBestCriterion);
+           eRes.average = theBestAverage;
+           eRes.criterion = theBestCriterion;
            eRes.trDipDir = getTrueDipDirection(angleX_ * noRotationX,
                                                 angleY_ * noRotationY,
                                                 angleZ_ * noRotationZ
@@ -378,7 +382,7 @@ namespace tServiceREST
         public double z;
         public double cr;
         public string info;
-        public string priznak;
+
 
         public Point(Point point)
         {

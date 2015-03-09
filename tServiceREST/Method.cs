@@ -40,28 +40,6 @@ namespace MyService
         [DataMember] public int yElPos { get; set; }
         [DataMember] public int zElPos { get; set; }
         public BmObj() { }
-        //public BmObj(BmObj bmObj, int nParts, int numOfPart)
-        //{
-        //    this.xAxis = bmObj.xAxis;
-        //    this.yAxis = bmObj.yAxis;
-        //    this.zAxis = bmObj.zAxis;
-        //    this.xElPos = bmObj.xElPos;
-        //    this.yElPos = bmObj.yElPos;
-        //    this.zElPos = bmObj.zElPos;
-        //    int itemFrom = (numOfPart - 1) * bmObj.points.Count() / nParts;
-        //    int itemTo = numOfPart != nParts ?
-        //                                        numOfPart * bmObj.points.Count() / nParts
-        //                                     :
-        //                                        bmObj.points.Count()-1;
-
-        //    points = new Point[itemTo-itemFrom];
-        //    int k = 0;
-        //    for (int i = itemFrom; i <= itemTo; i++)
-        //    {
-        //        this.points[k++] = new Point(bmObj.points[i]);
-        //    }
-        //}
-
         public BmObj(BmObj bmObj, int nParts, int numOfPart)
         {
             this.xAxis = bmObj.xAxis;
@@ -110,14 +88,37 @@ namespace MyService
     public class Ellipse
     {
         public static readonly ILog log = LogManager.GetLogger(typeof(Ellipse));
-
+        private double? criterion_;
+        
         [DataMember] public Point point { get; set; }
         [DataMember] public double trDipDir { get; set; }
         [DataMember] public double trDip { get; set; }
-
+        [DataMember]
+        public double? average {get;set;}
+        [DataMember]
+        public double? criterion
+        {
+            get { return criterion_; }
+            set
+            {
+                criterion_ = value;
+                double? percentCriterionIntoAverage = criterion_ / average * 100.0;
+                if (percentCriterionIntoAverage < 30)
+                    powerZone = 0;
+                else if (percentCriterionIntoAverage >= 30 && percentCriterionIntoAverage < 50)
+                    powerZone = 1;
+                else if (percentCriterionIntoAverage >= 50 && percentCriterionIntoAverage < 70)
+                    powerZone = 2;
+                else if (percentCriterionIntoAverage >= 70)
+                    powerZone = 3;
+            }
+            
+        }
+        [DataMember]
+        public int powerZone { get; set; }
         public enum Method { Variance, Median }
 
-        private double? criterion_ { get; set; }
+        //private double? criterion_ { get; set; }
         private int? nIndication_ { get; set; }
 
         private double axisEllipseA_ { get; set; }
@@ -152,7 +153,7 @@ namespace MyService
                 }
 
             }
-
+            average = Math.Sqrt(sumSquareOfIndication / nIndication);
             criterion_ = (sumSquareOfIndication / nIndication) - Math.Pow(sumOfIndication / nIndication, 2); // For a while Variance only
             nIndication_ = nIndication;
 
